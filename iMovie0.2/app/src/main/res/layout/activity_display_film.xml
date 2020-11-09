@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ScrollView
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollView1"
+        >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:paddingLeft="40dp"
+            android:paddingRight="25dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            tools:context="mobile.imovie.DisplayFilm">
+
+
+            <EditText
+                android:id="@+id/editTextTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="128dp"
+                android:layout_marginTop="5dp"
+                android:ems="10"
+                android:inputType="text"
+                android:paddingLeft="5dp"
+                android:paddingRight="25dp"></EditText>
+
+            <TextView
+                android:id="@+id/textViewTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/editTextTitle"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="8dp"
+                android:layout_marginBottom="-6dp"
+                android:text="Title : "
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <Button
+                android:id="@+id/saveButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/editTextGenre"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="-15dp"
+                android:layout_marginBottom="5dp"
+                android:onClick="saveData"
+                android:text="Save" />
+
+            <TextView
+                android:id="@+id/textViewYear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/editTextYear"
+                android:layout_alignLeft="@+id/textViewTitle"
+                android:text="Release Year : "
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/textViewGenre"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/textViewYear"
+                android:layout_alignBottom="@+id/editTextGenre"
+                android:text="Genre : "
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+
+            <EditText
+                android:id="@+id/editTextGenre"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/editTextTitle"
+                android:layout_below="@+id/editTextYear"
+                android:ems="10"
+                android:inputType="text" >
+
+                <requestFocus />
+            </EditText>
+
+            <EditText
+                android:id="@+id/editTextYear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/editTextGenre"
+                android:layout_below="@+id/editTextTitle"
+                android:ems="10"
+                android:inputType="number" />
+
+        </RelativeLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
+
