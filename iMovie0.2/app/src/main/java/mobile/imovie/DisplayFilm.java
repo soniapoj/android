@@ -121,7 +121,7 @@ public class DisplayFilm extends AppCompatActivity {
             //searchNameStringRequest("It", 2017);
 
         } else {
-            Toast.makeText(getApplicationContext(), "Record not added :(", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Record not added :( :(", Toast.LENGTH_SHORT).show();
         }
 
     }
