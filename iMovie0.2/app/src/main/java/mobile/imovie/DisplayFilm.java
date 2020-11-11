@@ -85,7 +85,7 @@ public class DisplayFilm extends AppCompatActivity {
                         try {
                             JSONObject result;
                             result = new JSONObject(response);
-                            System.out.println("YOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+                            //System.out.println("YOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
                             Toast.makeText(getApplicationContext(),result.toString(),Toast.LENGTH_LONG).show();
                           //  result = new JSONObject(response).getJSONObject("list");
                            // int maxItems = result.getInt("end");
@@ -95,7 +95,7 @@ public class DisplayFilm extends AppCompatActivity {
                             // catch for the JSON parsing error
                         } catch (JSONException e) {
                             //Toast.makeText(AddFoodItems.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                            Toast.makeText(getApplicationContext(),"DORIN E K@K@",Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(),"Ooopsie ^^",Toast.LENGTH_LONG).show();
                         }
                     } // public void onResponse(String response)
                 }, // Response.Listener<String>()
@@ -122,6 +122,18 @@ public class DisplayFilm extends AppCompatActivity {
 
         } else {
             Toast.makeText(getApplicationContext(), "Record not added :( :(", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    public void deletefilm(View view){
+        this.title = findViewById(R.id.firstListElement);
+        this.year = findViewById(R.id.secondListElement);
+        if (mydb.deleteFilm(this.title.getText().toString(), Integer.parseInt(year.getText().toString()))>0) {
+            Toast.makeText(getApplicationContext(), "Successfully Deleted! xD", Toast.LENGTH_SHORT).show();
+            showWatchlist();
+                } else {
+            Toast.makeText(getApplicationContext(), "Record not deleted :( :(", Toast.LENGTH_SHORT).show();
         }
 
     }

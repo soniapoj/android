@@ -72,9 +72,10 @@ public class DBHelper extends SQLiteOpenHelper {
         return true;
     }
 
-    public Integer deleteFilm(Integer id) {
+    public Integer deleteFilm(String title, int year) {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.delete("watchlist", "_id = ?", new String[]{Integer.toString(id)});
+        //String whereClause = "title=" + title + " and year=?";
+        return db.delete("watchlist", "title=? and year=?", new String[]{title, Integer.toString(year)});
     }
 
     public Cursor getData(int filmId) {
