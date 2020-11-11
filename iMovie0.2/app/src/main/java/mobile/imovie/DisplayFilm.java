@@ -132,6 +132,7 @@ public class DisplayFilm extends AppCompatActivity {
         if (mydb.deleteFilm(this.title.getText().toString(), Integer.parseInt(year.getText().toString()))>0) {
             Toast.makeText(getApplicationContext(), "Successfully Deleted! xD", Toast.LENGTH_SHORT).show();
             showWatchlist();
+
                 } else {
             Toast.makeText(getApplicationContext(), "Record not deleted :( :(", Toast.LENGTH_SHORT).show();
         }
