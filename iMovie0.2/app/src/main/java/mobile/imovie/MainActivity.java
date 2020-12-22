@@ -18,4 +18,11 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(MainActivity.this, DisplayFilm.class));
     }
 
+    public void showWatched(View v){
+        startActivity(new Intent(MainActivity.this, ListManager.class));
+    }
+
+    public void showRecommended(View v){
+        startActivity(new Intent(MainActivity.this, RecommendActivity.class));
+    }
 }

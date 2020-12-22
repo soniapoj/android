@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.widget.Toast;
 
 import java.util.HashMap;
 
@@ -28,14 +29,14 @@ public class DBHelper extends SQLiteOpenHelper {
     private HashMap hp;
 
     public DBHelper(Context context) {
-        super(context, DATABASE_NAME, null, 5);
+        super(context, DATABASE_NAME, null, 7);
     }
 
     @Override
     public void
     onCreate(SQLiteDatabase db) {
         db.execSQL(
-                "create table watchlist " +
+                "create table watchlist" +
                         "(_id integer primary key autoincrement, title text,year integer,genre1 text, genre2 text, genre3 text, director text, screenwriter text, actor1 text, actor2 text)"
         );
     }
@@ -55,28 +56,34 @@ public class DBHelper extends SQLiteOpenHelper {
         contantValues.put(COLUMN_TITLE, filmTitle);
         contantValues.put(COLUMN_RELEASE_YEAR, releaseYear);
         contantValues.put(COLUMN_GENRE_1, filmGenre);
+        contantValues.put(COLUMN_GENRE_2, "");
+        contantValues.put(COLUMN_GENRE_3, "");
+        contantValues.put(COLUMN_DIRECTOR, "");
+        contantValues.put(COLUMN_WRITER, "");
+        contantValues.put(COLUMN_ACTOR_1, "");
+        contantValues.put(COLUMN_ACTOR_2, "");
         db.insert(TABLE_NAME, null, contantValues);
         db.close();
         return true;
     }
 
-    public boolean addFilm(String filmTitle, Integer releaseYear, String genre1, String genre2, String genre3, String director, String writer, String actor1, String actor2) {
-        /*,*/
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues contantValues = new ContentValues();
-        contantValues.put(COLUMN_TITLE, filmTitle);
-        contantValues.put(COLUMN_RELEASE_YEAR, releaseYear);
-        contantValues.put(COLUMN_GENRE_1, genre1);
-        contantValues.put(COLUMN_GENRE_2, genre2);
-        contantValues.put(COLUMN_GENRE_2, genre3);
-        contantValues.put(COLUMN_DIRECTOR, director);
-        contantValues.put(COLUMN_WRITER, writer);
-        contantValues.put(COLUMN_ACTOR_1, actor1);
-        contantValues.put(COLUMN_ACTOR_2, actor2);
-        db.insert(TABLE_NAME, null, contantValues);
-        db.close();
-        return true;
-    }
+//    public boolean addFilm(String filmTitle, Integer releaseYear, String genre1, String genre2, String genre3, String director, String writer, String actor1, String actor2) {
+//        /*,*/
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        ContentValues contantValues = new ContentValues();
+//        contantValues.put(COLUMN_TITLE, filmTitle);
+//        contantValues.put(COLUMN_RELEASE_YEAR, releaseYear);
+//        contantValues.put(COLUMN_GENRE_1, genre1);
+//        contantValues.put(COLUMN_GENRE_2, genre2);
+//        contantValues.put(COLUMN_GENRE_3, genre3);
+//        contantValues.put(COLUMN_DIRECTOR, director);
+//        contantValues.put(COLUMN_WRITER, writer);
+//        contantValues.put(COLUMN_ACTOR_1, actor1);
+//        contantValues.put(COLUMN_ACTOR_2, actor2);
+//        db.insert(TABLE_NAME, null, contantValues);
+//        db.close();
+//        return true;
+//    }
 
     public boolean updateFilm(Integer filmId, String filmTitle, Integer releaseYear, String genre1, String genre2, String genre3, String director, String writer, String actor1, String actor2) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -85,7 +92,7 @@ public class DBHelper extends SQLiteOpenHelper {
         contantValues.put(COLUMN_RELEASE_YEAR, releaseYear);
         contantValues.put(COLUMN_GENRE_1, genre1);
         contantValues.put(COLUMN_GENRE_2, genre2);
-        contantValues.put(COLUMN_GENRE_2, genre3);
+        contantValues.put(COLUMN_GENRE_3, genre3);
         contantValues.put(COLUMN_DIRECTOR, director);
         contantValues.put(COLUMN_WRITER, writer);
         contantValues.put(COLUMN_ACTOR_1, actor1);
@@ -121,5 +128,12 @@ public class DBHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public Integer getFilmId(String title, String year){
+        Integer id = -1;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("Select _id from watchlist where title=? and year=?", new String[] {title, year});
+        return res.getInt(res.getColumnIndex("_id"));
     }
 }
