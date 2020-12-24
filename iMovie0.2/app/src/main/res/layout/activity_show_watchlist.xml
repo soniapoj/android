@@ -6,45 +6,38 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <View
+        android:id="@+id/divider"
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="?android:attr/listDivider"
+        tools:ignore="MissingConstraints" />
+
+    <GridView
+        android:id="@+id/lstView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="0dp"
+        android:clickable="true"
+        android:divider="#713"
+        android:dividerHeight="1dp"
+        android:listSelector="#006cd9"
+        android:numColumns="2"
+        tools:layout_editor_absoluteX="-134dp"
+        tools:ignore="MissingConstraints">
+
+
+    </GridView>
+
     <Button
         android:id="@+id/watchlistButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/watchlistText"
         android:layout_alignStart="@+id/watchlistText"
         android:onClick="addMovie"
         android:text="ADD MOVIE"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
     />
-
-    <TextView
-        android:id="@+id/watchlistText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="204dp"
-        android:text="MY WATCHLIST"
-        android:textAlignment="center"
-        android:textSize="25dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-         />
-
-    <ListView
-        android:id="@+id/lstView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="0dp"
-        android:clickable="true"
-        android:divider="#713"
-        android:dividerHeight="1dp"
-        android:listSelector="#006cd9"
-        app:layout_constraintTop_toBottomOf="@id/watchlistText"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="-134dp">
-
-
-    </ListView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

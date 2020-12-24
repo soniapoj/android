@@ -19,6 +19,7 @@ public class ListDBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_LIST_NAME = "list_name";
     public static final String COLUMN_MOVIE_TITLE = "movie_title";
     public static final String COLUMN_MOVIE_YEAR = "movie_year";
+    public static final String COLUMN_MOVIE_POSTER = "movie_poster";
 
     public ListDBHelper(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -29,31 +30,32 @@ public class ListDBHelper extends SQLiteOpenHelper {
     }
 
     public ListDBHelper(@Nullable Context context) {
-        super(context, DATABASE_NAME, null, 7);
+        super(context, DATABASE_NAME, null, 12);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(
                 "create table movie_lists " +
-                        "(_id integer primary key autoincrement, list_name text,movie_title text, movie_year integer)");
+                        "(_id integer primary key autoincrement, list_name text,movie_title text, movie_year integer, movie_poster text)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (newVersion > oldVersion) {
-            db.execSQL("DROP TABLE IF EXISTS watchlist");
+            db.execSQL("DROP TABLE IF EXISTS movie_lists");
             onCreate(db);
         }
     }
 
 
-    public boolean addFilm(String listName, String movieTitle, Integer movieYear) {
+    public boolean addFilm(String listName, String movieTitle, Integer movieYear, String moviePoster) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contantValues = new ContentValues();
         contantValues.put(COLUMN_LIST_NAME, listName);
         contantValues.put(COLUMN_MOVIE_TITLE, movieTitle);
         contantValues.put(COLUMN_MOVIE_YEAR, movieYear);
+        contantValues.put(COLUMN_MOVIE_POSTER, moviePoster);
         db.insert(TABLE_NAME, null, contantValues);
         db.close();
         return true;
@@ -72,5 +74,9 @@ public class ListDBHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             return null;
         }
+    }
+    public int deleteAllFilms(String listName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete("movie_lists", "list_name=?", new String[]{listName});
     }
 }

@@ -6,6 +6,7 @@ import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
@@ -16,22 +17,30 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class RecommendActivity extends AppCompatActivity {
 
     private ListView lstView;
+    private ListDBHelper recommendedDB;
     private ListDBHelper watchedDB;
     private JSONObject recList;
     SimpleCursorAdapter adapter;
     private String Title;
-    private String foundYear;
+    private static String foundYear;
+    private static String foundTitle;
+    private static String foundPosterUrl = "";
+    private ImageView imgView;
     private RequestQueue queue;
+    private RequestQueue queue1;
 
 
     @Override
@@ -39,11 +48,34 @@ public class RecommendActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recommend);
         this.lstView = findViewById(R.id.lstView);
-        this.watchedDB = new ListDBHelper(this);
-        showRecommended();
+        this.recommendedDB = new ListDBHelper(this);
+        this.recommendedDB.deleteAllFilms("recommended");
+        queue = Volley.newRequestQueue(this);
+        queue1 = Volley.newRequestQueue(this);
+        getWatchHistory();
+        //showRecommended();
     }
 
-    private StringRequest getReleaseYear(String str){
+    private void getWatchHistory() {
+        try {
+            if (this.watchedDB == null)
+                this.watchedDB = new ListDBHelper(this);
+            Cursor c = watchedDB.getAllFilms("watched");
+            c.moveToFirst();
+            c.moveToNext();
+            String title = c.getString(c.getColumnIndex("movie_title"));
+            int year = Integer.parseInt(c.getString(c.getColumnIndex("movie_year")));
+            if(year <= 2017){
+                queue.add(getRecommandations(title));
+                //Toast.makeText(RecommendActivity.this, title, Toast.LENGTH_LONG).show();
+                showRecommended();
+            }
+        } catch (Exception ex) {
+            Toast.makeText(RecommendActivity.this, ex.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private StringRequest getMovieDetails(String str){
         final String API = "&apikey=853dfb92";
         final String TITLE_SEARCH = "&t=";
         final String TYPE = "&type=movie";
@@ -51,8 +83,7 @@ public class RecommendActivity extends AppCompatActivity {
         final String URL_PREFIX = "http://www.omdbapi.com/?";
 
         //String url = URL_PREFIX + API + TITLE_SEARCH +Title + TYPE + RELEASE_YEAR + Year;
-        String url = URL_PREFIX + API + TITLE_SEARCH +Title + TYPE;
-
+        String url = URL_PREFIX + API + TITLE_SEARCH + str + TYPE;
         // 1st param => type of method (GET/PUT/POST/PATCH/etc)
         // 2nd param => complete url of the API
         // 3rd param => Response.Listener -> Success procedure
@@ -70,6 +101,9 @@ public class RecommendActivity extends AppCompatActivity {
                             JSONObject result;
                             result = new JSONObject(response);
                             foundYear = result.getString("Year");
+                            foundPosterUrl = result.getString("Poster");
+                            //System.out.println(foundPosterUrl);
+                           // Toast.makeText(getApplicationContext(),foundPosterUrl,Toast.LENGTH_LONG).show();
                         } catch (JSONException e) {
                             Toast.makeText(getApplicationContext(),"Ooopsie ^^",Toast.LENGTH_SHORT).show();
                         }
@@ -85,7 +119,7 @@ public class RecommendActivity extends AppCompatActivity {
     }
 
     private StringRequest getRecommandations(String title){
-        final String URL_PREFIX = "http://1d8d977ebaed.ngrok.io/predict?movie=";
+        final String URL_PREFIX = "http://bf721c0b70ba.ngrok.io/predict?movie=";
 
         String url = URL_PREFIX + title;
 
@@ -98,12 +132,25 @@ public class RecommendActivity extends AppCompatActivity {
                         System.out.println(response);
                        // Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
                         try {
-                            JSONArray result;
+                            List<String> result;
                             response = response.replace("\\", "");
-                            result = new JSONArray(response);
-                            System.out.println(response);
-                            Toast.makeText(getApplicationContext(),result.toString(),Toast.LENGTH_LONG).show();
-                        } catch (JSONException e) {
+                            response = response.replace("[", "");
+                            response = response.replace("]", "");
+                            result = Arrays.asList(response.split(","));
+                            //Toast.makeText(getApplicationContext(),result.toString(),Toast.LENGTH_LONG).show();
+                            for(String res: result){
+                                res = res.replace("'", "");
+                             //   Toast.makeText(getApplicationContext(),res,Toast.LENGTH_LONG).show();
+                                queue1.add(getMovieDetails(res));
+                                Toast.makeText(getApplicationContext(), foundPosterUrl, Toast.LENGTH_LONG).show();
+                                if(!foundPosterUrl.equals("")) {
+                                    recommendedDB.addFilm("recommended", res, Integer.valueOf(foundYear), foundPosterUrl);
+
+                                }
+                            }
+                           // System.out.println(result);
+                           // Toast.makeText(getApplicationContext(),result.toString(),Toast.LENGTH_LONG).show();
+                        } catch (Exception e) {
                             Toast.makeText(getApplicationContext(),"Ooopsie ^^ " + e.getMessage(),Toast.LENGTH_LONG).show();
                             //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
                         }
@@ -120,27 +167,16 @@ public class RecommendActivity extends AppCompatActivity {
 
     private void showRecommended() {
         try {
-            int[] id = {R.id.firstListElement, R.id.secondListElement};
-            String[] title = new String[]{"title", "year"};
-            if (this.watchedDB == null)
-                this.watchedDB = new ListDBHelper(this);
-            Cursor c = watchedDB.getAllFilms("watched");
-            String str = "";
-            queue = Volley.newRequestQueue(this);
-            if (c.moveToFirst()) {
-                //System.out.println(Arrays.toString(c.getColumnNames()));
-                c.moveToNext();
-                c.moveToNext();
-                str = c.getString(c.getColumnIndex("movie_title"));
-                System.out.println(str);
-            }
-            queue.add(getRecommandations(str));
-//            adapter = new SimpleCursorAdapter(this,
-//                    R.layout.watched_list_template, c, title, id, 0);
-//            lstView.setAdapter(adapter);
+            if (this.recommendedDB == null)
+                this.recommendedDB = new ListDBHelper(this);
+            Cursor c = recommendedDB.getAllFilms("recommended");
+            Toast.makeText(getApplicationContext(), "cursor", Toast.LENGTH_LONG).show();
+            this.lstView = findViewById(R.id.lstView);
+            CustomCursorAdapter customCursorAdapter = new CustomCursorAdapter(this, c);
+            lstView.setAdapter(customCursorAdapter);
 
         } catch (Exception ex) {
-            Toast.makeText(RecommendActivity.this, "bubu" + ex.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(RecommendActivity.this, ex.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 }

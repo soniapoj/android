@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
@@ -18,7 +19,7 @@ public class ListManager extends AppCompatActivity {
     TextView title;
     TextView year;
     TextView genre;
-    ListView lstView;
+    GridView lstView;
     private RequestQueue queue;
     EditText titleEdit;
     EditText yearEdit;
@@ -31,7 +32,8 @@ public class ListManager extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.show_watched);
+        //setContentView(R.layout.show_watched);
+        setContentView(R.layout.activity_show_watchlist);
         this.lstView = findViewById(R.id.lstView);
         this.mydb = new ListDBHelper(this);
         showWatched();
@@ -40,14 +42,14 @@ public class ListManager extends AppCompatActivity {
 
     private void showWatched() {
         try {
-            int[] id = {R.id.firstListElement, R.id.secondListElement};
-            String[] title = new String[]{"movie_title", "movie_year"};
             if (this.mydb == null)
                 this.mydb = new ListDBHelper(this);
             Cursor c = mydb.getAllFilms("watched");
-            adapter = new SimpleCursorAdapter(this,
-                    R.layout.watched_list_template, c, title, id, 0);
-            lstView.setAdapter(adapter);
+            CustomCursorAdapterWatched customCursorAdapter = new CustomCursorAdapterWatched(this, c);
+            lstView.setAdapter(customCursorAdapter);
+//            adapter = new SimpleCursorAdapter(this,
+//                    R.layout.watched_list_template, c, title, id, 0);
+//            lstView.setAdapter(adapter);
 
         } catch (Exception ex) {
             Toast.makeText(ListManager.this, ex.getMessage(), Toast.LENGTH_LONG).show();

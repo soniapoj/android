@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
@@ -23,6 +25,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,13 +38,16 @@ public class DisplayFilm extends AppCompatActivity {
     TextView title;
     TextView year;
     TextView genre;
-    ListView lstView;
+    GridView lstView;
+    ImageView imgView;
     private RequestQueue queue;
     EditText titleEdit;
     EditText yearEdit;
     EditText genreEdit;
     String foundYear = "";
     String foundGenre = "";
+    String foundPosterUrl = "";
+    String foundTitle = "";
     SimpleCursorAdapter adapter;
 
 
@@ -57,14 +63,20 @@ public class DisplayFilm extends AppCompatActivity {
 
     private void showWatchlist() {
         try {
-            int[] id = {R.id.firstListElement, R.id.secondListElement};
-            String[] title = new String[]{"title", "year"};
+
+// Attach cursor adapter to the ListView
+
+//            int[] id = {R.id.firstListElement, R.id.secondListElement};
+//            String[] title = new String[]{"title", "year"};
             if (this.mydb == null)
                 this.mydb = new DBHelper(this);
             Cursor c = mydb.getAllFilms();
-            adapter = new SimpleCursorAdapter(this,
-                    R.layout.list_template, c, title, id, 0);
-            lstView.setAdapter(adapter);
+            this.lstView = findViewById(R.id.lstView);
+            CustomCursorAdapter customCursorAdapter = new CustomCursorAdapter(this, c);
+//            adapter = new SimpleCursorAdapter(this,
+//                    R.layout.list_template, c, title, id, 0);
+            //lstView.setAdapter(adapter);
+            lstView.setAdapter(customCursorAdapter);
 
         } catch (Exception ex) {
             Toast.makeText(DisplayFilm.this, ex.getMessage(), Toast.LENGTH_LONG).show();
@@ -76,23 +88,40 @@ public class DisplayFilm extends AppCompatActivity {
         this.title = findViewById(R.id.editTextTitle);
         this.year = findViewById(R.id.editTextYear);
         this.genre = findViewById(R.id.editTextGenre);
+        this.imgView = findViewById(R.id.imageView);
         queue = Volley.newRequestQueue(this);
         title.addTextChangedListener(new TextWatcher() {
 
-            public void afterTextChanged(Editable s) {}
-
-            public void beforeTextChanged(CharSequence s, int start,
-                                          int count, int after) {
-            }
-
-            public void onTextChanged(CharSequence s, int start,
-                                      int before, int count) {
-                //queue.add(searchNameStringRequest(this.title.getText().toString(), Integer.parseInt(this.year.getText().toString())));
-                queue.add(searchNameStringRequest(title.getText().toString()));
+            public void afterTextChanged(Editable s) {
+                queue.add(searchNameStringRequest(s.toString()));
                 if(foundYear != "")
                     year.setText(foundYear);
                 if(foundGenre != "")
                     genre.setText(foundGenre);
+                if(!foundPosterUrl.equals(""))
+                    Picasso.get().load(foundPosterUrl).into(imgView);
+            }
+
+            public void beforeTextChanged(CharSequence s, int start,
+                                          int count, int after) {
+//                queue.add(searchNameStringRequest(title.getText().toString()));
+//                if(foundYear != "")
+//                    year.setText(foundYear);
+//                if(foundGenre != "")
+//                    genre.setText(foundGenre);
+            }
+
+            public void onTextChanged(CharSequence s, int start,
+                                      int before, int count) {
+//                String toSearch = title.getText().toString() + " ";
+//                //queue.add(searchNameStringRequest(this.title.getText().toString(), Integer.parseInt(this.year.getText().toString())));
+//                queue.add(searchNameStringRequest(toSearch));
+//                if(foundYear != "")
+//                    year.setText(foundYear);
+//                if(foundGenre != "")
+//                    genre.setText(foundGenre);
+//                if(!foundPosterUrl.equals(""))
+//                    Picasso.get().load(foundPosterUrl).into(imgView);
             }
         });
 
@@ -124,9 +153,11 @@ public class DisplayFilm extends AppCompatActivity {
                         try {
                             JSONObject result;
                             result = new JSONObject(response);
+                            foundTitle = result.getString("Title");
                             foundYear = result.getString("Year");
                             foundGenre = result.getString("Genre");
-                            //Toast.makeText(getApplicationContext(),result.toString(),Toast.LENGTH_LONG).show();
+                            foundPosterUrl = result.getString("Poster");
+                           // Toast.makeText(getApplicationContext(),result.toString(),Toast.LENGTH_LONG).show();
                           //  result = new JSONObject(response).getJSONObject("list");
                            // int maxItems = result.getInt("end");
                           //  JSONArray resultList = result.getJSONArray("item");
@@ -151,7 +182,7 @@ public class DisplayFilm extends AppCompatActivity {
     }
 
     public void saveData(View view) {
-        if (mydb.addFilm(this.title.getText().toString(), Integer.parseInt(this.year.getText().toString()), this.genre.getText().toString())) {
+        if (mydb.addFilm(this.foundTitle, Integer.parseInt(this.year.getText().toString()), this.genre.getText().toString(), this.foundPosterUrl)) {
             startActivity(new Intent(DisplayFilm.this, DisplayFilm.class));
            Toast.makeText(getApplicationContext(), "Successfully Added! xD", Toast.LENGTH_SHORT).show();
            // queue = Volley.newRequestQueue(this);
@@ -165,9 +196,14 @@ public class DisplayFilm extends AppCompatActivity {
 
     }
     public void deletefilm(View view) {
+        System.out.println("**********************************************************************************************************************************");
         View parent = (View) view.getParent();
-        TextView titleView = parent.findViewById(R.id.firstListElement);
+        View granParent = (View) parent.getParent();
+        View titleLayout = (View) granParent.findViewById(R.id.relativeLayout);
+        TextView titleView = titleLayout.findViewById(R.id.firstListElement);
         TextView yearView = parent.findViewById(R.id.secondListElement);
+        System.out.println(titleView);
+        System.out.println(yearView);
         System.out.println(titleView.getText() + "   " + yearView.getText());
         if (mydb.deleteFilm(titleView.getText().toString(), Integer.parseInt(yearView.getText().toString())) > 0) {
             Toast.makeText(getApplicationContext(), "Successfully Deleted! xD", Toast.LENGTH_SHORT).show();
@@ -178,10 +214,12 @@ public class DisplayFilm extends AppCompatActivity {
     }
     public void addToWatched(View view) {
         View parent = (View) view.getParent();
-        TextView titleView = parent.findViewById(R.id.firstListElement);
+        View granParent = (View) parent.getParent();
+        View titleLayout = (View) granParent.findViewById(R.id.relativeLayout);
+        TextView titleView = titleLayout.findViewById(R.id.firstListElement);
         TextView yearView = parent.findViewById(R.id.secondListElement);
         ListDBHelper listDB = new ListDBHelper(this);
-        listDB.addFilm("watched", titleView.getText().toString(), Integer.parseInt(yearView.getText().toString()));
+        listDB.addFilm("watched", titleView.getText().toString(), Integer.parseInt(yearView.getText().toString()), mydb.getFilmPoster(titleView.getText().toString(), yearView.getText().toString()));
         if (mydb.deleteFilm(titleView.getText().toString(), Integer.parseInt(yearView.getText().toString())) > 0) {
             showWatchlist();
         }

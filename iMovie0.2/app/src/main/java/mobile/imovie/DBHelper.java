@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class DBHelper extends SQLiteOpenHelper {
@@ -24,12 +25,13 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_WRITER = "screenwriter";
     public static final String COLUMN_ACTOR_1 = "actor1";
     public static final String COLUMN_ACTOR_2 = "actor2";
+    public static final String COLUMN_POSTER = "poster";
 
 
     private HashMap hp;
 
     public DBHelper(Context context) {
-        super(context, DATABASE_NAME, null, 7);
+        super(context, DATABASE_NAME, null, 12);
     }
 
     @Override
@@ -37,7 +39,7 @@ public class DBHelper extends SQLiteOpenHelper {
     onCreate(SQLiteDatabase db) {
         db.execSQL(
                 "create table watchlist" +
-                        "(_id integer primary key autoincrement, title text,year integer,genre1 text, genre2 text, genre3 text, director text, screenwriter text, actor1 text, actor2 text)"
+                        "(_id integer primary key autoincrement, title text,year integer,genre1 text, genre2 text, genre3 text, director text, screenwriter text, actor1 text, actor2 text, poster text)"
         );
     }
 
@@ -49,7 +51,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public boolean addFilm(String filmTitle, Integer releaseYear, String filmGenre) {
+    public boolean addFilm(String filmTitle, Integer releaseYear, String filmGenre, String posterURL) {
         /*,*/
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contantValues = new ContentValues();
@@ -62,6 +64,7 @@ public class DBHelper extends SQLiteOpenHelper {
         contantValues.put(COLUMN_WRITER, "");
         contantValues.put(COLUMN_ACTOR_1, "");
         contantValues.put(COLUMN_ACTOR_2, "");
+        contantValues.put(COLUMN_POSTER, posterURL);
         db.insert(TABLE_NAME, null, contantValues);
         db.close();
         return true;
@@ -135,5 +138,16 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor res = db.rawQuery("Select _id from watchlist where title=? and year=?", new String[] {title, year});
         return res.getInt(res.getColumnIndex("_id"));
+    }
+
+    public String getFilmPoster(String title, String year){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("Select poster from watchlist where title=? and year=?", new String[] {title, year});
+        System.out.println(Arrays.toString(res.getColumnNames()));
+        System.out.println(res.getColumnIndexOrThrow("poster"));
+        System.out.println(res.getCount());
+        res.moveToFirst();
+        System.out.println(res.getColumnIndex("poster"));
+        return res.getString(res.getColumnIndex("poster"));
     }
 }

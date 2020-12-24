@@ -5,59 +5,94 @@
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="match_parent">
-    <LinearLayout
-        android:id = "@+id/relativeLayout1"
-        android:layout_width = "fill_parent"
-        android:layout_height = "wrap_content"
-        tools:ignore="MissingConstraints"
-        android:orientation="horizontal"
-        android:divider="#713">
 
-        <TextView
-            android:id="@+id/firstListElement"
-            android:layout_width="209dp"
-            android:layout_height="fill_parent"
-            android:background="#E6E6FA"
-            android:padding="5dp"
-            android:text="Hello Word"
-            android:textColor="#000"
-            android:textSize="20sp"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/customborder"
+        >
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="211dp"
+            android:layout_height="245dp"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <LinearLayout
+            android:id="@+id/relativeLayout"
+            android:layout_width="212dp"
+            android:layout_height="40dp"
+            android:divider="#713"
+            android:orientation="horizontal"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintHeight_max="40dp"
             tools:ignore="MissingConstraints">
 
-        </TextView>
+            <TextView
+                android:id="@+id/firstListElement"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:autoSizeMaxTextSize="100sp"
+                android:autoSizeMinTextSize="12sp"
+                android:autoSizeStepGranularity="2sp"
+                android:autoSizeTextType="uniform"
+                android:padding="5dp"
+                android:text="Title"
+                android:textAlignment="center"
+                tools:ignore="MissingConstraints">
 
-        <TextView
-            android:id="@+id/secondListElement"
-            android:layout_width="101dp"
-            android:layout_height="wrap_content"
-            android:background="#E6E6FA"
-            android:padding="5dp"
-            android:text="Year"
-            android:textColor="#000"
-            android:textSize="20sp"
-            tools:ignore="MissingConstraints"
-            tools:layout_editor_absoluteX="16dp"
-            tools:layout_editor_absoluteY="185dp">
+            </TextView>
 
-        </TextView>
+        </LinearLayout>
 
-        <ImageView
-            android:id="@+id/eye"
-            android:layout_width="52dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="0dp"
-            android:background="@drawable/eye"
-            android:onClick="addToWatched" />
+        <LinearLayout
+            android:id="@+id/relativeLayout1"
+            android:layout_width="212dp"
+            android:layout_height="25dp"
+            android:layout_marginTop="2dp"
+            android:divider="#713"
+            android:orientation="horizontal"
+            tools:ignore="MissingConstraints">
 
-        <ImageView
-            android:id="@+id/trash"
-            android:layout_width="46dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="0dp"
-            android:background="@drawable/trash2"
-            android:onClick="deletefilm" />
+            <TextView
+                android:id="@+id/secondListElement"
+                android:layout_width="131dp"
+                android:layout_height="match_parent"
+                android:autoSizeMaxTextSize="100sp"
+                android:autoSizeMinTextSize="12sp"
+                android:autoSizeStepGranularity="2sp"
+                android:autoSizeTextType="uniform"
+                android:padding="5dp"
+                android:text="Year"
+                android:textAlignment="center"
+                tools:ignore="MissingConstraints"
+                tools:layout_editor_absoluteX="16dp"
+                tools:layout_editor_absoluteY="185dp">
+
+            </TextView>
+
+            <ImageView
+                android:id="@+id/eye"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="0dp"
+                android:background="@drawable/eye"
+                android:onClick="addToWatched" />
+
+            <ImageView
+                android:id="@+id/trash"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="0dp"
+                android:background="@drawable/trash2"
+                android:onClick="deletefilm" />
+        </LinearLayout>
 
     </LinearLayout>
 
