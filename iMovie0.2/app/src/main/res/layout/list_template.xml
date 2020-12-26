@@ -14,6 +14,7 @@
         tools:layout_editor_absoluteY="0dp"
         android:layout_height="match_parent"
         android:background="@drawable/customborder"
+
         >
 
         <ImageView
@@ -35,7 +36,7 @@
 
             <TextView
                 android:id="@+id/firstListElement"
-                android:layout_width="match_parent"
+                android:layout_width="199dp"
                 android:layout_height="match_parent"
                 android:autoSizeMaxTextSize="100sp"
                 android:autoSizeMinTextSize="12sp"
@@ -61,7 +62,7 @@
 
             <TextView
                 android:id="@+id/secondListElement"
-                android:layout_width="131dp"
+                android:layout_width="124dp"
                 android:layout_height="match_parent"
                 android:autoSizeMaxTextSize="100sp"
                 android:autoSizeMinTextSize="12sp"
@@ -83,11 +84,12 @@
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="0dp"
                 android:background="@drawable/eye"
-                android:onClick="addToWatched" />
+                android:onClick="addToWatched"
+                android:paddingRight="15dp"/>
 
             <ImageView
                 android:id="@+id/trash"
-                android:layout_width="30dp"
+                android:layout_width="29dp"
                 android:layout_height="match_parent"
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="0dp"

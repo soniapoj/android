@@ -36,7 +36,7 @@ public class ListDBHelper extends SQLiteOpenHelper {
     }
 
     public ListDBHelper(@Nullable Context context) {
-        super(context, DATABASE_NAME, null, 14);
+        super(context, DATABASE_NAME, null, 16);
     }
 
     @Override

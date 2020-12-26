@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PersonalStatistics">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:text="Most watched genres: "
+                android:textAlignment="center"
+                android:textSize="25dp"
+                tools:ignore="MissingConstraints" />
+
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/pieChart"
+                android:layout_width="match_parent"
+                android:layout_height="458dp"
+                tools:ignore="MissingConstraints">
+
+            </com.github.mikephil.charting.charts.PieChart>
+
+            <TextView
+                android:id="@+id/watchtime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Total watchtime not available!"
+                android:textAlignment="center"
+                android:textSize="25dp"
+                android:paddingTop="25dp"
+                android:paddingBottom="25dp" />
+
+            <TextView
+                android:id="@+id/watched"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No movies watched yet!"
+                android:textAlignment="center"
+                android:textSize="25dp"
+                android:paddingTop="25dp"
+                android:paddingBottom="25dp" />
+
+            <TextView
+                android:id="@+id/wishlist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No movies on watchlist yet!"
+                android:textAlignment="center"
+                android:textSize="25dp"
+                android:paddingTop="25dp"
+                android:paddingBottom="25dp" />
+
+            <TextView
+                android:id="@+id/favorites"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No favorite movies yet!"
+                android:textAlignment="center"
+                android:textSize="25dp"
+                android:paddingTop="25dp"
+                android:paddingBottom="25dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

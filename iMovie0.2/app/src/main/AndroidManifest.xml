@@ -12,8 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.IMovie">
-        
-        <activity android:name=".RecommendActivity" />
+
         <!--
                Set to true if your app is Standalone, that is, it does not require the handheld
                app to run.
@@ -31,7 +30,7 @@
         </activity>
         <activity
             android:name=".DisplayFilm"
-            android:label="Watchlist">
+            android:label="My Watchlist">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -41,6 +40,24 @@
         <activity
             android:name=".ListManager"
             android:label="Watch History">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".PersonalStatistics"
+            android:label="Personal Statistics">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".RecommendActivity"
+            android:label="You might also like">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

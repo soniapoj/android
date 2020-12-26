@@ -30,4 +30,7 @@ public class MainActivity extends AppCompatActivity {
     public void showRecommended(View v){
         startActivity(new Intent(MainActivity.this, RecommendActivity.class));
     }
+    public void showStatistics(View v){
+        startActivity(new Intent(MainActivity.this, PersonalStatistics.class));
+    }
 }

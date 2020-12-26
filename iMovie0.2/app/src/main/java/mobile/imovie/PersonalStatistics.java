@@ -1,0 +1,100 @@
+package mobile.imovie;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.database.Cursor;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.widget.TextView;
+
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
+public class PersonalStatistics extends AppCompatActivity {
+    PieChart pieChart;
+    PieData pieData;
+    PieDataSet pieDataSet;
+    ArrayList pieEntries;
+    ArrayList pieEntryLabels;
+    ListDBHelper mydb;
+    DBHelper wishlistDB;
+    HashMap<String, Integer> distinctGenres;
+    Cursor cursor;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_personal_statistics);
+        pieChart = findViewById(R.id.pieChart);
+        pieChart.setDrawHoleEnabled(false);
+        pieChart.getDescription().setText("");
+        pieChart.getLegend().setEnabled(false);
+        pieChart.setUsePercentValues(true);
+        getGenres();
+        pieDataSet = new PieDataSet(pieEntries, "");
+        pieData = new PieData(pieDataSet);
+        pieData.setValueFormatter(new PercentFormatter(new DecimalFormat("#.#")));
+        pieChart.setData(pieData);
+        pieDataSet.setColors(ColorTemplate.JOYFUL_COLORS);
+        pieDataSet.setSliceSpace(2f);
+        pieDataSet.setValueTextColor(Color.BLACK);
+        pieChart.setEntryLabelColor(Color.BLACK);
+        pieChart.setEntryLabelTextSize(20);
+        pieDataSet.setValueTextSize(17);
+        pieDataSet.setSliceSpace(5f);
+        setTotals();
+
+    }
+
+    private void setTotals() {
+        TextView watchtime = findViewById(R.id.watchtime);
+        TextView watched = findViewById(R.id.watched);
+        TextView wishlist = findViewById(R.id.wishlist);
+        TextView favorites = findViewById(R.id.favorites);
+        if(cursor.getCount() > 0) {
+            String text = "Number of movies watched: " + cursor.getCount();
+            watched.setText(text);
+        }
+        this.wishlistDB = new DBHelper(this);
+        cursor = wishlistDB.getAllFilms();
+        if(cursor.getCount() > 0){
+            String text = "Number of movies on watchlist: " + cursor.getCount();
+            wishlist.setText(text);
+        }
+    }
+
+    private void getGenres() {
+        pieEntries = new ArrayList<>();
+        this.mydb = new ListDBHelper(this);
+        distinctGenres = new HashMap<>();
+        cursor = mydb.getAllFilms("watched");
+        cursor.moveToFirst();
+        String currentGenres = "";
+        int nrOfGenres = cursor.getCount();
+        while(!cursor.isAfterLast()){
+            currentGenres = cursor.getString(cursor.getColumnIndex("movie_genre"));
+            String[] genres = currentGenres.split(", ");
+            System.out.println("************************************************************************************************");
+            for(String currentGenre: genres) {
+                if (distinctGenres.containsKey(currentGenre))
+                    distinctGenres.put(currentGenre, distinctGenres.get(currentGenre) + 1);
+                else
+                    distinctGenres.put(currentGenre, 1);
+            }
+            cursor.moveToNext();
+        }
+        for(Map.Entry<String, Integer> genre: distinctGenres.entrySet()){
+            PieEntry newEntry = new PieEntry((float)genre.getValue()/nrOfGenres * 100, genre.getKey());
+            pieEntries.add(newEntry);
+        }
+    }
+}
