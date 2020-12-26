@@ -55,10 +55,12 @@
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@+id/editTextGenre"
                 android:layout_alignParentBottom="true"
-                android:layout_marginLeft="-15dp"
-                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="-14dp"
+                android:layout_marginBottom="12dp"
+                android:backgroundTint="#26ff00"
                 android:onClick="saveData"
-                android:text="Save" />
+                android:text="Save"
+                app:cornerRadius="30dp" />
 
             <TextView
                 android:id="@+id/textViewYear"
@@ -106,8 +108,8 @@
                 android:layout_height="342dp"
                 android:layout_below="@+id/editTextGenre"
                 android:layout_alignLeft="@+id/editTextGenre"
-                android:layout_marginLeft="-118dp"
-                android:layout_marginTop="35dp"
+                android:layout_marginLeft="-109dp"
+                android:layout_marginTop="23dp"
                 tools:srcCompat="@tools:sample/avatars" />
 
         </RelativeLayout>

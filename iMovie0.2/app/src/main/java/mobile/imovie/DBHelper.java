@@ -13,7 +13,7 @@ import java.util.HashMap;
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    public class Film {
+    public static class Film {
 
         public String foundYear;
         public String foundTitle;
@@ -72,7 +72,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private HashMap hp;
 
     public DBHelper(Context context) {
-        super(context, DATABASE_NAME, null, 16);
+        super(context, DATABASE_NAME, null, 18);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class DBHelper extends SQLiteOpenHelper {
     onCreate(SQLiteDatabase db) {
         db.execSQL(
                 "create table watchlist" +
-                        "(_id integer primary key autoincrement, title text,year integer,genre1 text, director text, screenwriter text, actor1 text, actor2 text, poster text)"
+                        "(_id integer primary key autoincrement, title text,year integer,genre1 text, director text, screenwriter text, actor1 text, actor2 text, poster text, unique(title, year))"
         );
     }
 

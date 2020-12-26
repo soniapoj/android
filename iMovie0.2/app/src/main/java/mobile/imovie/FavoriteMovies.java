@@ -7,8 +7,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -27,27 +25,20 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DisplayFilm extends AppCompatActivity {
-
-
-
-    DBHelper mydb;
+public class FavoriteMovies extends AppCompatActivity {
+    ListDBHelper mydb;
     TextView title;
     TextView year;
     TextView genre;
     GridView lstView;
     ImageView imgView;
     private RequestQueue queue;
-    EditText titleEdit;
-    EditText yearEdit;
-    EditText genreEdit;
     String foundYear = "";
     String foundGenre = "";
     String foundDirector = "";
@@ -56,30 +47,47 @@ public class DisplayFilm extends AppCompatActivity {
     String foundActor2 = "";
     String foundPosterUrl = "";
     String foundTitle = "";
-    SimpleCursorAdapter adapter;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //setContentView(R.layout.show_watched);
         setContentView(R.layout.activity_show_watchlist);
         this.lstView = findViewById(R.id.lstView);
-        this.mydb = new DBHelper(this);
-        showWatchlist();
+        this.mydb = new ListDBHelper(this);
+        showFavorites();
 
     }
 
-    private void showWatchlist() {
+    private void showFavorites() {
         try {
             if (this.mydb == null)
-                this.mydb = new DBHelper(this);
-            Cursor c = mydb.getAllFilms();
-            this.lstView = findViewById(R.id.lstView);
-            CustomCursorAdapter customCursorAdapter = new CustomCursorAdapter(this, c);
+                this.mydb = new ListDBHelper(this);
+            Cursor c = mydb.getAllFilms("favorites");
+            System.out.println("showFavorites()");
+            System.out.println(c.getCount());
+            CustomCursorAdapterFavorites customCursorAdapter = new CustomCursorAdapterFavorites(this, c);
             lstView.setAdapter(customCursorAdapter);
-
         } catch (Exception ex) {
-            Toast.makeText(DisplayFilm.this, ex.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(FavoriteMovies.this, ex.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void deletefilm(View view) {
+        View parent = (View) view.getParent();
+        View granParent = (View) parent.getParent();
+        View titleLayout = (View) granParent.findViewById(R.id.relativeLayout);
+        TextView titleView = titleLayout.findViewById(R.id.firstListElement);
+        TextView yearView = parent.findViewById(R.id.secondListElement);
+        System.out.println(titleView);
+        System.out.println(yearView);
+        System.out.println(titleView.getText() + "   " + yearView.getText());
+        if (mydb.deleteFilm("favorites", titleView.getText().toString(), Integer.parseInt(yearView.getText().toString())) > 0) {
+            Toast.makeText(getApplicationContext(), "Successfully Deleted! xD", Toast.LENGTH_SHORT).show();
+            showFavorites();
+        } else {
+            Toast.makeText(getApplicationContext(), "Record not deleted :( :(", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -154,7 +162,7 @@ public class DisplayFilm extends AppCompatActivity {
 
                             foundPosterUrl = result.getString("Poster");
                         } catch (JSONException e) {
-                            Toast.makeText(DisplayFilm.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(FavoriteMovies.this, e.getMessage(), Toast.LENGTH_LONG).show();
                         }
                     } // public void onResponse(String response)
                 }, // Response.Listener<String>()
@@ -170,63 +178,13 @@ public class DisplayFilm extends AppCompatActivity {
     }
 
     public void saveData(View view) {
-        if (mydb.addFilm(this.foundTitle, Integer.parseInt(this.year.getText().toString()), this.genre.getText().toString(), this.foundPosterUrl, this.foundDirector, this.foundWriter, this.foundActor1, this.foundActor2)) {
-            startActivity(new Intent(DisplayFilm.this, DisplayFilm.class));
+        if (mydb.addFilm("watched", this.foundTitle, Integer.parseInt(this.year.getText().toString()), this.genre.getText().toString(), this.foundPosterUrl, this.foundDirector, this.foundWriter, this.foundActor1, this.foundActor2)) {
+            startActivity(new Intent(FavoriteMovies.this, ListManager.class));
             Toast.makeText(getApplicationContext(), "Successfully Added! xD", Toast.LENGTH_SHORT).show();
 
         } else {
             Toast.makeText(getApplicationContext(), "Record not added :( :(", Toast.LENGTH_SHORT).show();
         }
-
-    }
-
-    public void deletefilm(View view) {
-        View parent = (View) view.getParent();
-        View granParent = (View) parent.getParent();
-        View titleLayout = (View) granParent.findViewById(R.id.relativeLayout);
-        TextView titleView = titleLayout.findViewById(R.id.firstListElement);
-        TextView yearView = parent.findViewById(R.id.secondListElement);
-        System.out.println(titleView);
-        System.out.println(yearView);
-        System.out.println(titleView.getText() + "   " + yearView.getText());
-        if (mydb.deleteFilm(titleView.getText().toString(), Integer.parseInt(yearView.getText().toString())) > 0) {
-            Toast.makeText(getApplicationContext(), "Successfully Deleted! xD", Toast.LENGTH_SHORT).show();
-            showWatchlist();
-        } else {
-            Toast.makeText(getApplicationContext(), "Record not deleted :( :(", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public void addToWatched(View view) {
-        View parent = (View) view.getParent();
-        View granParent = (View) parent.getParent();
-        View titleLayout = (View) granParent.findViewById(R.id.relativeLayout);
-        TextView titleView = titleLayout.findViewById(R.id.firstListElement);
-        TextView yearView = parent.findViewById(R.id.secondListElement);
-        ListDBHelper listDB = new ListDBHelper(this);
-        DBHelper.Film found = mydb.getFilmByTitleAndYear(titleView.getText().toString(),yearView.getText().toString());
-        System.out.println(found);
-        listDB.addFilm("watched", titleView.getText().toString(), Integer.parseInt(yearView.getText().toString()), found.foundGenre,mydb.getFilmPoster(titleView.getText().toString(), yearView.getText().toString()),found.foundDirector,found.foundScreenwriter,found.foundactor1,found.foundactor2);
-        if (mydb.deleteFilm(titleView.getText().toString(), Integer.parseInt(yearView.getText().toString())) > 0) {
-            showWatchlist();
-        }
-        Toast.makeText(getApplicationContext(), "Moved to Watched!", Toast.LENGTH_SHORT).show();
-
-    }
-
-
-    public void showDetails(View view) {
-                View parent = (View) view.getParent();
-        View granParent = (View) parent.getParent();
-        View titleLayout = (View) granParent.findViewById(R.id.relativeLayout);
-        TextView titleView = titleLayout.findViewById(R.id.firstListElement);
-        TextView yearView = parent.findViewById(R.id.secondListElement);
-       String Title = titleView.getText().toString();
-       String Year = yearView.getText().toString();
-       DBHelper.Film thisfilm = mydb.getFilmByTitleAndYear(Title,Year);
-       setContentView(R.layout.detailed_film);
-       TextView titletext = findViewById(R.id.titleDetail);
-       titletext.setText(thisfilm.foundTitle);
     }
 
     @Override

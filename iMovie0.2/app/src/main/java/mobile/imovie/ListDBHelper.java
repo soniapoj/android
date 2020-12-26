@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseErrorHandler;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Build;
@@ -11,6 +12,8 @@ import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+
+import java.util.Arrays;
 
 public class ListDBHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "db.movies";
@@ -36,14 +39,15 @@ public class ListDBHelper extends SQLiteOpenHelper {
     }
 
     public ListDBHelper(@Nullable Context context) {
-        super(context, DATABASE_NAME, null, 16);
+        super(context, DATABASE_NAME, null, 18);
+        //deleteAllFilms("recommended");
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(
                 "create table movie_lists " +
-                        "(_id integer primary key autoincrement, list_name text,movie_title text, movie_year integer, movie_genre text, movie_director text, movie_writer text, movie_actor1 text, movie_actor2 text,movie_poster text)");
+                        "(_id integer primary key autoincrement, list_name text,movie_title text, movie_year integer, movie_genre text, movie_director text, movie_writer text, movie_actor1 text, movie_actor2 text,movie_poster text, unique(list_name, movie_title, movie_year))");
     }
 
     @Override
@@ -56,26 +60,40 @@ public class ListDBHelper extends SQLiteOpenHelper {
 
 
     public boolean addFilm(String listName, String filmTitle, Integer releaseYear, String filmGenre, String posterURL, String Director, String Writer, String Actor1, String Actor2) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues contantValues = new ContentValues();
-        contantValues.put(COLUMN_LIST_NAME, listName);
-        contantValues.put(COLUMN_MOVIE_TITLE, filmTitle);
-        contantValues.put(COLUMN_MOVIE_YEAR, releaseYear);
-        contantValues.put(COLUMN_MOVIE_POSTER, posterURL);
-        contantValues.put(COLUMN_MOVIE_GENRE_1, filmGenre);
-        contantValues.put(COLUMN_MOVIE_DIRECTOR, Director);
-        contantValues.put(COLUMN_MOVIE_WRITER, Writer);
-        contantValues.put(COLUMN_MOVIE_ACTOR_1, Actor1);
-        contantValues.put(COLUMN_MOVIE_ACTOR_2, Actor2);
-        db.insert(TABLE_NAME, null, contantValues);
-        db.close();
-        return true;
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues contantValues = new ContentValues();
+            contantValues.put(COLUMN_LIST_NAME, listName);
+            contantValues.put(COLUMN_MOVIE_TITLE, filmTitle);
+            contantValues.put(COLUMN_MOVIE_YEAR, releaseYear);
+            contantValues.put(COLUMN_MOVIE_POSTER, posterURL);
+            contantValues.put(COLUMN_MOVIE_GENRE_1, filmGenre);
+            contantValues.put(COLUMN_MOVIE_DIRECTOR, Director);
+            contantValues.put(COLUMN_MOVIE_WRITER, Writer);
+            contantValues.put(COLUMN_MOVIE_ACTOR_1, Actor1);
+            contantValues.put(COLUMN_MOVIE_ACTOR_2, Actor2);
+        try {
+            db.insert(TABLE_NAME, null, contantValues);
+            db.close();
+            return true;
+        }catch (Exception e){
+            return true;
+        }
     }
 
     public Integer deleteFilm(String title, int year) {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.delete("movie_lists", "movie_title=? and movie_year=?", new String[]{title, Integer.toString(year)});
+        int result = db.delete("movie_lists", "movie_title=? and movie_year=?", new String[]{title, Integer.toString(year)});
+        db.close();
+        return result;
     }
+
+    public Integer deleteFilm(String listName, String title, int year) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int result = db.delete("movie_lists", "list_name=? and movie_title=? and movie_year=?", new String[]{listName, title, Integer.toString(year)});
+        db.close();
+        return result;
+    }
+
 
     public Cursor getAllFilms(String listName) {
         try {
@@ -87,8 +105,27 @@ public class ListDBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public int deleteAllFilms(String listName) {
+    public void deleteAllFilms(String listName) {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.delete("movie_lists", "list_name=?", new String[]{listName});
+        db.execSQL("delete from "+ TABLE_NAME +" where list_name='"+listName+"'");
+        db.close();
+    }
+
+    public DBHelper.Film getFilmByTitleAndYear(String title, String year) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("Select * from movie_lists where movie_title=? and movie_year=?", new String[]{title, year});
+        res.moveToFirst();
+        return new DBHelper.Film(res.getString(res.getColumnIndex("movie_year")), res.getString(res.getColumnIndex("movie_title")), res.getString(res.getColumnIndex("movie_poster")), res.getString(res.getColumnIndex("movie_genre")), res.getString(res.getColumnIndex("movie_director")), res.getString(res.getColumnIndex("movie_writer")), res.getString(res.getColumnIndex("movie_actor1")), res.getString(res.getColumnIndex("movie_actor2")));
+    }
+
+    public String getFilmPoster(String title, String year) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("Select movie_poster from movie_lists where movie_title=? and movie_year=?", new String[]{title, year});
+        System.out.println(Arrays.toString(res.getColumnNames()));
+        System.out.println(res.getColumnIndexOrThrow("movie_poster"));
+        System.out.println(res.getCount());
+        res.moveToFirst();
+        System.out.println(res.getColumnIndex("movie_poster"));
+        return res.getString(res.getColumnIndex("movie_poster"));
     }
 }

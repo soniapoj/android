@@ -79,7 +79,8 @@
             android:layout_marginHorizontal="5dp"
             android:backgroundTint="#80ced6"
             android:text="FAVOURITE MOVIES"
-            android:drawableLeft="@drawable/favorites"/>
+            android:drawableLeft="@drawable/favorites"
+            android:onClick="showFavorites"/>
 
     </LinearLayout>
 

@@ -28,6 +28,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".FavoriteMovies"
+            android:label="Favourite Movies">
+        </activity>
         <activity
             android:name=".DisplayFilm"
             android:label="My Watchlist">
@@ -57,7 +60,7 @@
         </activity>
         <activity
             android:name=".RecommendActivity"
-            android:label="You might also like">
+            android:label="You might also like:">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

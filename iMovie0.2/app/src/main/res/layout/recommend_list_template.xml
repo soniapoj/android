@@ -80,16 +80,8 @@
                 android:layout_height="match_parent"
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="0dp"
-                android:background="@drawable/heart"
-                android:onClick="addToFavorites" />
-            <ImageView
-                android:id="@+id/trash"
-                android:layout_width="30dp"
-                android:layout_height="match_parent"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="0dp"
-                android:background="@drawable/trash2"
-                android:onClick="deletefilm" />
+                android:background="@drawable/future"
+                android:onClick="addToWatchlist" />
         </LinearLayout>
 
     </LinearLayout>

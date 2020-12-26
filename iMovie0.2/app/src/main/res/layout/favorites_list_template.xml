@@ -60,7 +60,7 @@
 
             <TextView
                 android:id="@+id/secondListElement"
-                android:layout_width="119dp"
+                android:layout_width="157dp"
                 android:layout_height="match_parent"
                 android:autoSizeMaxTextSize="100sp"
                 android:autoSizeMinTextSize="12sp"
@@ -74,14 +74,7 @@
                 tools:layout_editor_absoluteY="185dp">
 
             </TextView>
-            <ImageView
-                android:id="@+id/heart"
-                android:layout_width="30dp"
-                android:layout_height="match_parent"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="0dp"
-                android:background="@drawable/heart"
-                android:onClick="addToFavorites" />
+
             <ImageView
                 android:id="@+id/trash"
                 android:layout_width="30dp"

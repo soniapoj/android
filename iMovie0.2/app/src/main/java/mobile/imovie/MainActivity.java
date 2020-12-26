@@ -33,4 +33,7 @@ public class MainActivity extends AppCompatActivity {
     public void showStatistics(View v){
         startActivity(new Intent(MainActivity.this, PersonalStatistics.class));
     }
+    public void showFavorites(View v){
+        startActivity(new Intent(MainActivity.this, FavoriteMovies.class));
+    }
 }
