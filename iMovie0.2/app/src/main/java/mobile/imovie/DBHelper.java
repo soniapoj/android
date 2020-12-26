@@ -12,15 +12,56 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class DBHelper extends SQLiteOpenHelper {
+
+    public class Film {
+
+        public String foundYear;
+        public String foundTitle;
+        public String foundPosterUrl = "";
+        public String foundGenre;
+        public String foundDirector;
+        public String foundScreenwriter;
+        public String foundactor1;
+        public String foundactor2;
+
+
+        public Film(String foundYear, String foundTitle, String foundPosterUrl, String foundGenre, String foundDirector, String foundScreenwriter, String foundactor1, String foundactor2) {
+            this.foundYear = foundYear;
+            this.foundTitle = foundTitle;
+            this.foundPosterUrl = foundPosterUrl;
+            this.foundGenre = foundGenre;
+            this.foundDirector = foundDirector;
+            this.foundScreenwriter = foundScreenwriter;
+            this.foundactor1 = foundactor1;
+            this.foundactor2 = foundactor2;
+        }
+
+        @Override
+        public String toString() {
+            return "Film{" +
+                    "foundYear='" + foundYear + '\'' +
+                    ", foundTitle='" + foundTitle + '\'' +
+                    ", foundPosterUrl='" + foundPosterUrl + '\'' +
+                    ", foundGenre='" + foundGenre + '\'' +
+                    ", foundDirector='" + foundDirector + '\'' +
+                    ", foundScreenwriter='" + foundScreenwriter + '\'' +
+                    ", foundactor1='" + foundactor1 + '\'' +
+                    ", foundactor2='" + foundactor2 + '\'' +
+                    '}';
+        }
+
+        public Film(String foundTitle) {
+            this.foundTitle = foundTitle;
+        }
+    }
+
     public static final String DATABASE_NAME = "db.movies";
     public static final String TABLE_NAME = "watchlist";
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_TITLE = "title";
     public static final String COLUMN_RELEASE_YEAR = "year";
-    public static final String COLUMN_GENRE = "genre";
+    //public static final String COLUMN_GENRE = "genre";
     public static final String COLUMN_GENRE_1 = "genre1";
-    public static final String COLUMN_GENRE_2 = "genre2";
-    public static final String COLUMN_GENRE_3 = "genre3";
     public static final String COLUMN_DIRECTOR = "director";
     public static final String COLUMN_WRITER = "screenwriter";
     public static final String COLUMN_ACTOR_1 = "actor1";
@@ -31,7 +72,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private HashMap hp;
 
     public DBHelper(Context context) {
-        super(context, DATABASE_NAME, null, 12);
+        super(context, DATABASE_NAME, null, 14);
     }
 
     @Override
@@ -39,7 +80,7 @@ public class DBHelper extends SQLiteOpenHelper {
     onCreate(SQLiteDatabase db) {
         db.execSQL(
                 "create table watchlist" +
-                        "(_id integer primary key autoincrement, title text,year integer,genre1 text, genre2 text, genre3 text, director text, screenwriter text, actor1 text, actor2 text, poster text)"
+                        "(_id integer primary key autoincrement, title text,year integer,genre1 text, director text, screenwriter text, actor1 text, actor2 text, poster text)"
         );
     }
 
@@ -51,19 +92,17 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public boolean addFilm(String filmTitle, Integer releaseYear, String filmGenre, String posterURL) {
+    public boolean addFilm(String filmTitle, Integer releaseYear, String filmGenre, String posterURL, String Director, String Writer, String Actor1, String Actor2) {
         /*,*/
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contantValues = new ContentValues();
         contantValues.put(COLUMN_TITLE, filmTitle);
         contantValues.put(COLUMN_RELEASE_YEAR, releaseYear);
         contantValues.put(COLUMN_GENRE_1, filmGenre);
-        contantValues.put(COLUMN_GENRE_2, "");
-        contantValues.put(COLUMN_GENRE_3, "");
-        contantValues.put(COLUMN_DIRECTOR, "");
-        contantValues.put(COLUMN_WRITER, "");
-        contantValues.put(COLUMN_ACTOR_1, "");
-        contantValues.put(COLUMN_ACTOR_2, "");
+        contantValues.put(COLUMN_DIRECTOR, Director);
+        contantValues.put(COLUMN_WRITER, Writer);
+        contantValues.put(COLUMN_ACTOR_1, Actor1);
+        contantValues.put(COLUMN_ACTOR_2, Actor2);
         contantValues.put(COLUMN_POSTER, posterURL);
         db.insert(TABLE_NAME, null, contantValues);
         db.close();
@@ -88,14 +127,14 @@ public class DBHelper extends SQLiteOpenHelper {
 //        return true;
 //    }
 
-    public boolean updateFilm(Integer filmId, String filmTitle, Integer releaseYear, String genre1, String genre2, String genre3, String director, String writer, String actor1, String actor2) {
+    public boolean updateFilm(Integer filmId, String filmTitle, Integer releaseYear, String genre1, String director, String writer, String actor1, String actor2) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contantValues = new ContentValues();
         contantValues.put(COLUMN_TITLE, filmTitle);
         contantValues.put(COLUMN_RELEASE_YEAR, releaseYear);
         contantValues.put(COLUMN_GENRE_1, genre1);
-        contantValues.put(COLUMN_GENRE_2, genre2);
-        contantValues.put(COLUMN_GENRE_3, genre3);
+        //contantValues.put(COLUMN_GENRE_2, genre2);
+        //contantValues.put(COLUMN_GENRE_3, genre3);
         contantValues.put(COLUMN_DIRECTOR, director);
         contantValues.put(COLUMN_WRITER, writer);
         contantValues.put(COLUMN_ACTOR_1, actor1);
@@ -133,16 +172,23 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public Integer getFilmId(String title, String year){
+    public Integer getFilmId(String title, String year) {
         Integer id = -1;
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor res = db.rawQuery("Select _id from watchlist where title=? and year=?", new String[] {title, year});
+        Cursor res = db.rawQuery("Select _id from watchlist where title=? and year=?", new String[]{title, year});
         return res.getInt(res.getColumnIndex("_id"));
     }
 
-    public String getFilmPoster(String title, String year){
+    public Film getFilmByTitleAndYear(String title, String year) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("Select * from watchlist where title=? and year=?", new String[]{title, year});
+        res.moveToFirst();
+        return new Film(res.getString(res.getColumnIndex("year")), res.getString(res.getColumnIndex("title")), res.getString(res.getColumnIndex("poster")), res.getString(res.getColumnIndex("genre1")), res.getString(res.getColumnIndex("director")), res.getString(res.getColumnIndex("screenwriter")), res.getString(res.getColumnIndex("actor1")), res.getString(res.getColumnIndex("actor2")));
+    }
+
+    public String getFilmPoster(String title, String year) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("Select poster from watchlist where title=? and year=?", new String[] {title, year});
+        Cursor res = db.rawQuery("Select poster from watchlist where title=? and year=?", new String[]{title, year});
         System.out.println(Arrays.toString(res.getColumnNames()));
         System.out.println(res.getColumnIndexOrThrow("poster"));
         System.out.println(res.getCount());
@@ -150,4 +196,5 @@ public class DBHelper extends SQLiteOpenHelper {
         System.out.println(res.getColumnIndex("poster"));
         return res.getString(res.getColumnIndex("poster"));
     }
+
 }

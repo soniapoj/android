@@ -32,8 +32,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class DisplayFilm extends AppCompatActivity {
+
+
+
     DBHelper mydb;
     TextView title;
     TextView year;
@@ -46,6 +50,10 @@ public class DisplayFilm extends AppCompatActivity {
     EditText genreEdit;
     String foundYear = "";
     String foundGenre = "";
+    String foundDirector = "";
+    String foundWriter = "";
+    String foundActor1 = "";
+    String foundActor2 = "";
     String foundPosterUrl = "";
     String foundTitle = "";
     SimpleCursorAdapter adapter;
@@ -94,11 +102,11 @@ public class DisplayFilm extends AppCompatActivity {
 
             public void afterTextChanged(Editable s) {
                 queue.add(searchNameStringRequest(s.toString()));
-                if(foundYear != "")
+                if (foundYear != "")
                     year.setText(foundYear);
-                if(foundGenre != "")
+                if (foundGenre != "")
                     genre.setText(foundGenre);
-                if(!foundPosterUrl.equals(""))
+                if (!foundPosterUrl.equals(""))
                     Picasso.get().load(foundPosterUrl).into(imgView);
             }
 
@@ -127,6 +135,7 @@ public class DisplayFilm extends AppCompatActivity {
 
 
     }
+
     private StringRequest searchNameStringRequest(String Title) {
         final String API = "&apikey=853dfb92";
         final String TITLE_SEARCH = "&t=";
@@ -135,7 +144,7 @@ public class DisplayFilm extends AppCompatActivity {
         final String URL_PREFIX = "http://www.omdbapi.com/?";
 
         //String url = URL_PREFIX + API + TITLE_SEARCH +Title + TYPE + RELEASE_YEAR + Year;
-        String url = URL_PREFIX + API + TITLE_SEARCH +Title + TYPE;
+        String url = URL_PREFIX + API + TITLE_SEARCH + Title + TYPE;
 
         // 1st param => type of method (GET/PUT/POST/PATCH/etc)
         // 2nd param => complete url of the API
@@ -156,11 +165,27 @@ public class DisplayFilm extends AppCompatActivity {
                             foundTitle = result.getString("Title");
                             foundYear = result.getString("Year");
                             foundGenre = result.getString("Genre");
+                            foundDirector = result.getString("Director");
+                            foundWriter = result.getString("Writer");
+                            String actorsstring = result.getString("Actors");
+                            List<String> actorsList = new ArrayList<>();
+                            int len = actorsstring.split(",").length;
+                            if (len == 1) {
+                                foundActor1 = (actorsstring.split(",")[0]);
+                                foundActor2 = "";
+                            } else if (len == 2) {
+                                foundActor1 = (actorsstring.split(",")[0]);
+                                foundActor2 = (actorsstring.split(",")[1]);
+                            } else {
+                                foundActor1 = "";
+                                foundActor2 = "";
+                            }
+
                             foundPosterUrl = result.getString("Poster");
-                           // Toast.makeText(getApplicationContext(),result.toString(),Toast.LENGTH_LONG).show();
-                          //  result = new JSONObject(response).getJSONObject("list");
-                           // int maxItems = result.getInt("end");
-                          //  JSONArray resultList = result.getJSONArray("item");
+                            // Toast.makeText(getApplicationContext(),result.toString(),Toast.LENGTH_LONG).show();
+                            //  result = new JSONObject(response).getJSONObject("list");
+                            // int maxItems = result.getInt("end");
+                            //  JSONArray resultList = result.getJSONArray("item");
 
 
                             // catch for the JSON parsing error
@@ -182,10 +207,10 @@ public class DisplayFilm extends AppCompatActivity {
     }
 
     public void saveData(View view) {
-        if (mydb.addFilm(this.foundTitle, Integer.parseInt(this.year.getText().toString()), this.genre.getText().toString(), this.foundPosterUrl)) {
+        if (mydb.addFilm(this.foundTitle, Integer.parseInt(this.year.getText().toString()), this.genre.getText().toString(), this.foundPosterUrl, this.foundDirector, this.foundWriter, this.foundActor1, this.foundActor2)) {
             startActivity(new Intent(DisplayFilm.this, DisplayFilm.class));
-           Toast.makeText(getApplicationContext(), "Successfully Added! xD", Toast.LENGTH_SHORT).show();
-           // queue = Volley.newRequestQueue(this);
+            Toast.makeText(getApplicationContext(), "Successfully Added! xD", Toast.LENGTH_SHORT).show();
+            // queue = Volley.newRequestQueue(this);
             //queue.add(searchNameStringRequest(this.title.getText().toString(), Integer.parseInt(this.year.getText().toString())));
             //queue.add(searchNameStringRequest(this.title.getText().toString()));
             //searchNameStringRequest("It", 2017);
@@ -195,6 +220,7 @@ public class DisplayFilm extends AppCompatActivity {
         }
 
     }
+
     public void deletefilm(View view) {
         System.out.println("**********************************************************************************************************************************");
         View parent = (View) view.getParent();
@@ -212,19 +238,42 @@ public class DisplayFilm extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Record not deleted :( :(", Toast.LENGTH_SHORT).show();
         }
     }
+
     public void addToWatched(View view) {
+        System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
         View parent = (View) view.getParent();
         View granParent = (View) parent.getParent();
         View titleLayout = (View) granParent.findViewById(R.id.relativeLayout);
         TextView titleView = titleLayout.findViewById(R.id.firstListElement);
         TextView yearView = parent.findViewById(R.id.secondListElement);
         ListDBHelper listDB = new ListDBHelper(this);
-        listDB.addFilm("watched", titleView.getText().toString(), Integer.parseInt(yearView.getText().toString()), mydb.getFilmPoster(titleView.getText().toString(), yearView.getText().toString()));
+        DBHelper.Film found = mydb.getFilmByTitleAndYear(titleView.getText().toString(),yearView.getText().toString());
+        System.out.println(found);
+        listDB.addFilm("watched", titleView.getText().toString(), Integer.parseInt(yearView.getText().toString()), found.foundGenre,mydb.getFilmPoster(titleView.getText().toString(), yearView.getText().toString()),found.foundDirector,found.foundScreenwriter,found.foundactor1,found.foundactor2);
         if (mydb.deleteFilm(titleView.getText().toString(), Integer.parseInt(yearView.getText().toString())) > 0) {
             showWatchlist();
         }
         Toast.makeText(getApplicationContext(), "Moved to Watched!", Toast.LENGTH_SHORT).show();
 
+    }
+
+
+    public void showDetails(View view) {
+        //System.out.println("**********************************************************************************************************************************");
+        View parent = (View) view.getParent();
+        View granParent = (View) parent.getParent();
+        View titleLayout = (View) granParent.findViewById(R.id.relativeLayout);
+        TextView titleView = titleLayout.findViewById(R.id.firstListElement);
+        TextView yearView = parent.findViewById(R.id.secondListElement);
+        //System.out.println(titleView);
+        //System.out.println(yearView);
+       // System.out.println(titleView.getText() + "   " + yearView.getText());
+       String Title = titleView.getText().toString();
+       String Year = yearView.getText().toString();
+       DBHelper.Film thisfilm = mydb.getFilmByTitleAndYear(Title,Year);
+       setContentView(R.layout.detailed_film);
+       TextView titletext = findViewById(R.id.titleDetail);
+       titletext.setText(thisfilm.foundTitle);
     }
 }
 

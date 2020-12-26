@@ -17,6 +17,7 @@
         >
 
         <ImageView
+            android:onClick="showDetails"
             android:id="@+id/imageView"
             android:layout_width="211dp"
             android:layout_height="245dp"

@@ -55,6 +55,24 @@ public class ListManager extends AppCompatActivity {
             Toast.makeText(ListManager.this, ex.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
+
+    public void deletefilm(View view) {
+        System.out.println("**********************************************************************************************************************************");
+        View parent = (View) view.getParent();
+        View granParent = (View) parent.getParent();
+        View titleLayout = (View) granParent.findViewById(R.id.relativeLayout);
+        TextView titleView = titleLayout.findViewById(R.id.firstListElement);
+        TextView yearView = parent.findViewById(R.id.secondListElement);
+        System.out.println(titleView);
+        System.out.println(yearView);
+        System.out.println(titleView.getText() + "   " + yearView.getText());
+        if (mydb.deleteFilm(titleView.getText().toString(), Integer.parseInt(yearView.getText().toString())) > 0) {
+            Toast.makeText(getApplicationContext(), "Successfully Deleted! xD", Toast.LENGTH_SHORT).show();
+            showWatched();
+        } else {
+            Toast.makeText(getApplicationContext(), "Record not deleted :( :(", Toast.LENGTH_SHORT).show();
+        }
+    }
 //    public void deletefilm(View view) {
 //        View parent = (View) view.getParent();
 //        TextView titleView = parent.findViewById(R.id.firstListElement);

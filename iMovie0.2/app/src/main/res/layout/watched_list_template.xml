@@ -74,6 +74,7 @@
                 tools:layout_editor_absoluteY="185dp">
 
             </TextView>
+
             <ImageView
                 android:id="@+id/trash"
                 android:layout_width="30dp"

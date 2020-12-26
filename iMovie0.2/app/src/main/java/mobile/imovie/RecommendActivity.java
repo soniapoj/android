@@ -26,18 +26,26 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class RecommendActivity extends AppCompatActivity {
 
+
+    private static List<DBHelper.Film> RecomandedList = new ArrayList<>();
     private ListView lstView;
     private ListDBHelper recommendedDB;
     private ListDBHelper watchedDB;
     private JSONObject recList;
     SimpleCursorAdapter adapter;
-    private String Title;
+    //private String Title;
     private static String foundYear;
     private static String foundTitle;
     private static String foundPosterUrl = "";
+    private static String foundDirector = "";
+    private static String foundWriter = "";
+    private static String foundActor1 = "";
+    private static String foundActor2 = "";
+    private static String foundGenre = "";
     private ImageView imgView;
     private RequestQueue queue;
     private RequestQueue queue1;
@@ -63,9 +71,10 @@ public class RecommendActivity extends AppCompatActivity {
             Cursor c = watchedDB.getAllFilms("watched");
             c.moveToFirst();
             c.moveToNext();
+            c.moveToLast();
             String title = c.getString(c.getColumnIndex("movie_title"));
             int year = Integer.parseInt(c.getString(c.getColumnIndex("movie_year")));
-            if(year <= 2017){
+            if (year <= 2017) {
                 queue.add(getRecommandations(title));
                 //Toast.makeText(RecommendActivity.this, title, Toast.LENGTH_LONG).show();
                 showRecommended();
@@ -75,7 +84,7 @@ public class RecommendActivity extends AppCompatActivity {
         }
     }
 
-    private StringRequest getMovieDetails(String str){
+    private StringRequest getMovieDetails(String Title) {
         final String API = "&apikey=853dfb92";
         final String TITLE_SEARCH = "&t=";
         final String TYPE = "&type=movie";
@@ -83,7 +92,8 @@ public class RecommendActivity extends AppCompatActivity {
         final String URL_PREFIX = "http://www.omdbapi.com/?";
 
         //String url = URL_PREFIX + API + TITLE_SEARCH +Title + TYPE + RELEASE_YEAR + Year;
-        String url = URL_PREFIX + API + TITLE_SEARCH + str + TYPE;
+        String url = URL_PREFIX + API + TITLE_SEARCH + Title + TYPE;
+
         // 1st param => type of method (GET/PUT/POST/PATCH/etc)
         // 2nd param => complete url of the API
         // 3rd param => Response.Listener -> Success procedure
@@ -91,7 +101,7 @@ public class RecommendActivity extends AppCompatActivity {
         return new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     // 3rd param - method onResponse lays the code procedure of success return
-                    // SUCCESS //you can do it!
+                    // SUCCESS
                     @SuppressLint("ShowToast")
                     @Override
                     public void onResponse(String response) {
@@ -100,16 +110,42 @@ public class RecommendActivity extends AppCompatActivity {
                         try {
                             JSONObject result;
                             result = new JSONObject(response);
+                            foundTitle = result.getString("Title");
                             foundYear = result.getString("Year");
+                            foundGenre = result.getString("Genre");
+                            foundDirector = result.getString("Director");
+                            foundWriter = result.getString("Writer");
+                            String actorsstring = result.getString("Actors");
+                            List<String> actorsList = new ArrayList<>();
+                            int len = actorsstring.split(",").length;
+                            if (len == 1) {
+                                foundActor1 = (actorsstring.split(",")[0]);
+                                foundActor2 = "";
+                            } else if (len == 2) {
+                                foundActor1 = (actorsstring.split(",")[0]);
+                                foundActor2 = (actorsstring.split(",")[1]);
+                            } else {
+                                foundActor1 = "";
+                                foundActor2 = "";
+                            }
+
                             foundPosterUrl = result.getString("Poster");
-                            //System.out.println(foundPosterUrl);
-                           // Toast.makeText(getApplicationContext(),foundPosterUrl,Toast.LENGTH_LONG).show();
+                            // Toast.makeText(getApplicationContext(),result.toString(),Toast.LENGTH_LONG).show();
+                            //  result = new JSONObject(response).getJSONObject("list");
+                            // int maxItems = result.getInt("end");
+                            //  JSONArray resultList = result.getJSONArray("item");
+
+
+                            // catch for the JSON parsing error
                         } catch (JSONException e) {
-                            Toast.makeText(getApplicationContext(),"Ooopsie ^^",Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(AddFoodItems.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                            //Toast.makeText(getApplicationContext(),"Ooopsie ^^",Toast.LENGTH_LONG).show();
                         }
-                    }
-                },
+                    } // public void onResponse(String response)
+                }, // Response.Listener<String>()
                 new Response.ErrorListener() {
+                    // 4th param - method onErrorResponse lays the code procedure of error return
+                    // ERROR
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         // display a simple message on the screen
@@ -118,8 +154,8 @@ public class RecommendActivity extends AppCompatActivity {
                 });
     }
 
-    private StringRequest getRecommandations(String title){
-        final String URL_PREFIX = "http://bf721c0b70ba.ngrok.io/predict?movie=";
+    private StringRequest getRecommandations(String title) {
+        final String URL_PREFIX = "http://341b2727b691.ngrok.io/predict?movie=";
 
         String url = URL_PREFIX + title;
 
@@ -130,7 +166,7 @@ public class RecommendActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         System.out.println(response);
-                       // Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
+                        // Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
                         try {
                             List<String> result;
                             response = response.replace("\\", "");
@@ -138,20 +174,22 @@ public class RecommendActivity extends AppCompatActivity {
                             response = response.replace("]", "");
                             result = Arrays.asList(response.split(","));
                             //Toast.makeText(getApplicationContext(),result.toString(),Toast.LENGTH_LONG).show();
-                            for(String res: result){
+                            for (String res : result) {
                                 res = res.replace("'", "");
-                             //   Toast.makeText(getApplicationContext(),res,Toast.LENGTH_LONG).show();
+                                //   Toast.makeText(getApplicationContext(),res,Toast.LENGTH_LONG).show();
                                 queue1.add(getMovieDetails(res));
                                 Toast.makeText(getApplicationContext(), foundPosterUrl, Toast.LENGTH_LONG).show();
-                                if(!foundPosterUrl.equals("")) {
-                                    recommendedDB.addFilm("recommended", res, Integer.valueOf(foundYear), foundPosterUrl);
+                                if (!foundPosterUrl.equals("")) {
+                                    Toast.makeText(getApplicationContext(), "I GOT HERE XD ", Toast.LENGTH_LONG).show();
+
+                                    recommendedDB.addFilm("recommended", res, Integer.valueOf(foundYear), foundGenre,foundPosterUrl,foundDirector,foundWriter,foundActor1,foundActor2);
 
                                 }
                             }
-                           // System.out.println(result);
-                           // Toast.makeText(getApplicationContext(),result.toString(),Toast.LENGTH_LONG).show();
+                            // System.out.println(result);
+                            // Toast.makeText(getApplicationContext(),result.toString(),Toast.LENGTH_LONG).show();
                         } catch (Exception e) {
-                            Toast.makeText(getApplicationContext(),"Ooopsie ^^ " + e.getMessage(),Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), "Ooopsie ^^ " + e.getMessage(), Toast.LENGTH_LONG).show();
                             //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
                         }
                     }
@@ -170,7 +208,7 @@ public class RecommendActivity extends AppCompatActivity {
             if (this.recommendedDB == null)
                 this.recommendedDB = new ListDBHelper(this);
             Cursor c = recommendedDB.getAllFilms("recommended");
-            Toast.makeText(getApplicationContext(), "cursor", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), "cursor", Toast.LENGTH_LONG).show();
             this.lstView = findViewById(R.id.lstView);
             CustomCursorAdapter customCursorAdapter = new CustomCursorAdapter(this, c);
             lstView.setAdapter(customCursorAdapter);

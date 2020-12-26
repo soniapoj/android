@@ -20,6 +20,12 @@ public class ListDBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_MOVIE_TITLE = "movie_title";
     public static final String COLUMN_MOVIE_YEAR = "movie_year";
     public static final String COLUMN_MOVIE_POSTER = "movie_poster";
+    public static final String COLUMN_MOVIE_GENRE_1 = "movie_genre";
+    public static final String COLUMN_MOVIE_DIRECTOR = "movie_director";
+    public static final String COLUMN_MOVIE_WRITER = "movie_writer";
+    public static final String COLUMN_MOVIE_ACTOR_1 = "movie_actor1";
+    public static final String COLUMN_MOVIE_ACTOR_2 = "movie_actor2";
+
 
     public ListDBHelper(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -30,14 +36,14 @@ public class ListDBHelper extends SQLiteOpenHelper {
     }
 
     public ListDBHelper(@Nullable Context context) {
-        super(context, DATABASE_NAME, null, 12);
+        super(context, DATABASE_NAME, null, 14);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(
                 "create table movie_lists " +
-                        "(_id integer primary key autoincrement, list_name text,movie_title text, movie_year integer, movie_poster text)");
+                        "(_id integer primary key autoincrement, list_name text,movie_title text, movie_year integer, movie_genre text, movie_director text, movie_writer text, movie_actor1 text, movie_actor2 text,movie_poster text)");
     }
 
     @Override
@@ -49,13 +55,18 @@ public class ListDBHelper extends SQLiteOpenHelper {
     }
 
 
-    public boolean addFilm(String listName, String movieTitle, Integer movieYear, String moviePoster) {
+    public boolean addFilm(String listName, String filmTitle, Integer releaseYear, String filmGenre, String posterURL, String Director, String Writer, String Actor1, String Actor2) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contantValues = new ContentValues();
         contantValues.put(COLUMN_LIST_NAME, listName);
-        contantValues.put(COLUMN_MOVIE_TITLE, movieTitle);
-        contantValues.put(COLUMN_MOVIE_YEAR, movieYear);
-        contantValues.put(COLUMN_MOVIE_POSTER, moviePoster);
+        contantValues.put(COLUMN_MOVIE_TITLE, filmTitle);
+        contantValues.put(COLUMN_MOVIE_YEAR, releaseYear);
+        contantValues.put(COLUMN_MOVIE_POSTER, posterURL);
+        contantValues.put(COLUMN_MOVIE_GENRE_1, filmGenre);
+        contantValues.put(COLUMN_MOVIE_DIRECTOR, Director);
+        contantValues.put(COLUMN_MOVIE_WRITER, Writer);
+        contantValues.put(COLUMN_MOVIE_ACTOR_1, Actor1);
+        contantValues.put(COLUMN_MOVIE_ACTOR_2, Actor2);
         db.insert(TABLE_NAME, null, contantValues);
         db.close();
         return true;
@@ -63,7 +74,7 @@ public class ListDBHelper extends SQLiteOpenHelper {
 
     public Integer deleteFilm(String title, int year) {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.delete("movie_lists", "title=? and year=?", new String[]{title, Integer.toString(year)});
+        return db.delete("movie_lists", "movie_title=? and movie_year=?", new String[]{title, Integer.toString(year)});
     }
 
     public Cursor getAllFilms(String listName) {
@@ -75,6 +86,7 @@ public class ListDBHelper extends SQLiteOpenHelper {
             return null;
         }
     }
+
     public int deleteAllFilms(String listName) {
         SQLiteDatabase db = this.getWritableDatabase();
         return db.delete("movie_lists", "list_name=?", new String[]{listName});
