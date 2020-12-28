@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,8 +35,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DisplayFilm extends AppCompatActivity {
+import static android.view.View.VISIBLE;
 
+public class DisplayFilm extends AppCompatActivity {
 
 
     DBHelper mydb;
@@ -56,6 +58,11 @@ public class DisplayFilm extends AppCompatActivity {
     String foundActor2 = "";
     String foundPosterUrl = "";
     String foundTitle = "";
+    String foundRuntime = "";
+    String foundRated = "";
+    String foundPlot = "";
+    String foundAwards = "";
+    String foundimdbRating = "";
     SimpleCursorAdapter adapter;
 
 
@@ -74,6 +81,12 @@ public class DisplayFilm extends AppCompatActivity {
             if (this.mydb == null)
                 this.mydb = new DBHelper(this);
             Cursor c = mydb.getAllFilms();
+            if (c.getCount() == 0) {
+                ImageView i = findViewById(R.id.showifnotimg);
+                i.setVisibility(VISIBLE);
+                TextView t = findViewById(R.id.showifnottxt);
+                t.setVisibility(VISIBLE);
+            }
             this.lstView = findViewById(R.id.lstView);
             CustomCursorAdapter customCursorAdapter = new CustomCursorAdapter(this, c);
             lstView.setAdapter(customCursorAdapter);
@@ -138,8 +151,14 @@ public class DisplayFilm extends AppCompatActivity {
                             foundGenre = result.getString("Genre");
                             foundDirector = result.getString("Director");
                             foundWriter = result.getString("Writer");
-                            String actorsstring = result.getString("Actors");
+                            foundRuntime = result.getString("Runtime");
+                            foundRuntime = foundRuntime.replace(" min", "");
+                            foundRated = result.getString("Rated");
+                            foundPlot = result.getString("Plot");
+                            foundAwards = result.getString("Awards");
+                            foundimdbRating = result.getString("imdbRating");
                             List<String> actorsList = new ArrayList<>();
+                            String actorsstring = result.getString("Actors");
                             int len = actorsstring.split(",").length;
                             if (len == 1) {
                                 foundActor1 = (actorsstring.split(",")[0]);
@@ -151,6 +170,9 @@ public class DisplayFilm extends AppCompatActivity {
                                 foundActor1 = "";
                                 foundActor2 = "";
                             }
+                            foundActor1 = result.getString("Actors");
+                            foundActor2 = "";
+
 
                             foundPosterUrl = result.getString("Poster");
                         } catch (JSONException e) {
@@ -170,7 +192,7 @@ public class DisplayFilm extends AppCompatActivity {
     }
 
     public void saveData(View view) {
-        if (mydb.addFilm(this.foundTitle, Integer.parseInt(this.year.getText().toString()), this.genre.getText().toString(), this.foundPosterUrl, this.foundDirector, this.foundWriter, this.foundActor1, this.foundActor2)) {
+        if (mydb.addFilm(this.foundTitle, Integer.parseInt(this.year.getText().toString()), this.genre.getText().toString(), this.foundPosterUrl, this.foundDirector, this.foundWriter, this.foundActor1, this.foundActor2, this.foundRuntime, this.foundRated, this.foundPlot, this.foundAwards, this.foundimdbRating)) {
             startActivity(new Intent(DisplayFilm.this, DisplayFilm.class));
             Toast.makeText(getApplicationContext(), "Successfully Added! xD", Toast.LENGTH_SHORT).show();
 
@@ -204,9 +226,9 @@ public class DisplayFilm extends AppCompatActivity {
         TextView titleView = titleLayout.findViewById(R.id.firstListElement);
         TextView yearView = parent.findViewById(R.id.secondListElement);
         ListDBHelper listDB = new ListDBHelper(this);
-        DBHelper.Film found = mydb.getFilmByTitleAndYear(titleView.getText().toString(),yearView.getText().toString());
+        DBHelper.Film found = mydb.getFilmByTitleAndYear(titleView.getText().toString(), yearView.getText().toString());
         System.out.println(found);
-        listDB.addFilm("watched", titleView.getText().toString(), Integer.parseInt(yearView.getText().toString()), found.foundGenre,mydb.getFilmPoster(titleView.getText().toString(), yearView.getText().toString()),found.foundDirector,found.foundScreenwriter,found.foundactor1,found.foundactor2);
+        listDB.addFilm("watched", titleView.getText().toString(), Integer.parseInt(yearView.getText().toString()), found.foundGenre, mydb.getFilmPoster(titleView.getText().toString(), yearView.getText().toString()), found.foundDirector, found.foundScreenwriter, found.foundactor1, found.foundactor2, found.Runtime, found.Rated, found.Plot, found.Awards, found.imdbRating);
         if (mydb.deleteFilm(titleView.getText().toString(), Integer.parseInt(yearView.getText().toString())) > 0) {
             showWatchlist();
         }
@@ -216,17 +238,99 @@ public class DisplayFilm extends AppCompatActivity {
 
 
     public void showDetails(View view) {
-                View parent = (View) view.getParent();
+        View parent = (View) view.getParent();
         View granParent = (View) parent.getParent();
         View titleLayout = (View) granParent.findViewById(R.id.relativeLayout);
         TextView titleView = titleLayout.findViewById(R.id.firstListElement);
         TextView yearView = parent.findViewById(R.id.secondListElement);
-       String Title = titleView.getText().toString();
-       String Year = yearView.getText().toString();
-       DBHelper.Film thisfilm = mydb.getFilmByTitleAndYear(Title,Year);
-       setContentView(R.layout.detailed_film);
-       TextView titletext = findViewById(R.id.titleDetail);
-       titletext.setText(thisfilm.foundTitle);
+        //System.out.println(titleView);
+        //System.out.println(yearView);
+        // System.out.println(titleView.getText() + "   " + yearView.getText());
+        String Title = titleView.getText().toString();
+        String Year = yearView.getText().toString();
+        DBHelper.Film thisfilm = mydb.getFilmByTitleAndYear(Title, Year);
+        setContentView(R.layout.detailed_film);
+        TextView titletext = findViewById(R.id.titleDetail);
+        titletext.setText(thisfilm.foundTitle);
+        String a = "<b>Title:</b> " + thisfilm.foundTitle;
+        a += "\n";
+        titletext.setText(Html.fromHtml(a));
+        titletext.append("\n");
+        a = "";
+        a = "<b>Year:</b> " + thisfilm.foundYear;
+        TextView yeartext = findViewById(R.id.yearDetail);
+        a += "\n";
+        yeartext.setText(Html.fromHtml(a));
+        yeartext.append("\n");
+        ImageView imgView = findViewById(R.id.PosterDetail);
+        Picasso.get().load(thisfilm.foundPosterUrl).into(imgView);
+        a = "";
+        a = "<b>Genre:</b> " + thisfilm.foundGenre;
+        TextView genretext = findViewById(R.id.genreDetail);
+        genretext.setText(Html.fromHtml(a));
+        genretext.append("\n");
+        a = "";
+        a = "<b>Director:</b> " + thisfilm.foundDirector;
+        TextView directortext = findViewById(R.id.DirectorDetail);
+        directortext.setText(Html.fromHtml(a));
+        directortext.append("\n");
+        //directortext.setText(a);
+        a = "";
+        a = "<b>Screenwriter:</b> " + thisfilm.foundScreenwriter;
+        //TextView screenwritertext = findViewById(R.id.ScreenwriterDetail);
+        /// screenwritertext.setText(a);
+        if (!thisfilm.foundactor1.equals("")) {
+            a = "";
+            a = "<b>Actor:</b> " + thisfilm.foundactor1;
+            if (!thisfilm.foundactor2.equals("")) {
+                a += ", ";
+                a += thisfilm.foundactor2;
+                TextView actor1text = findViewById(R.id.Actor1Detail);
+                actor1text.setText(Html.fromHtml(a));
+                actor1text.append("\n");
+            }
+            TextView actor1text = findViewById(R.id.Actor1Detail);
+            actor1text.setText(Html.fromHtml(a));
+            actor1text.append("\n");
+        } else {
+            TextView actor1text = findViewById(R.id.Actor1Detail);
+            actor1text.setText("");
+        }
+
+
+        a = "";
+        a = "<b>Runtime:</b> " + thisfilm.Runtime;
+        TextView runtimetext = findViewById(R.id.RuntimeDetail);
+        runtimetext.setText(Html.fromHtml(a));
+        runtimetext.append("\n");
+        a = "";
+        a = "<b>Rated:</b> " + thisfilm.Rated;
+        TextView ratedtext = findViewById(R.id.RatedDetail);
+        ratedtext.setText(Html.fromHtml(a));
+        ratedtext.append("\n");
+        a = "";
+        a = "<b>Plot:</b> " + thisfilm.Plot;
+        TextView plottext = findViewById(R.id.PlotDetail);
+        plottext.setText(Html.fromHtml(a));
+        plottext.append("\n");
+        a = "";
+        a = "<b>Awards:</b> " + thisfilm.Awards;
+        TextView awardstext = findViewById(R.id.AwardsDetail);
+        awardstext.setText(Html.fromHtml(a));
+        awardstext.append("\n");
+        a = "";
+        a = "<b>imdbRating:</b> " + thisfilm.imdbRating;
+        a += "/10";
+        TextView imdbtext = findViewById(R.id.imdbRatingDetail);
+        imdbtext.setText(Html.fromHtml(a));
+        imdbtext.append("\n");
+        a = "";
+        a += "         ";
+        TextView emptytext = findViewById(R.id.empty);
+        emptytext.setText(a);
+        emptytext.append("\n");
+
+
     }
 
     @Override

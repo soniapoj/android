@@ -66,10 +66,17 @@ public class PersonalStatistics extends AppCompatActivity {
         }
         this.wishlistDB = new DBHelper(this);
         cursor = wishlistDB.getAllFilms();
+        if(cursor.getCount() == 0) {
+            setContentView(R.layout.activity_no_movies);
+        }
         if(cursor.getCount() > 0){
+
+
+
             String text = "Number of movies on watchlist: " + cursor.getCount();
             wishlist.setText(text);
         }
+        watchtime.setText(getRuntime());
     }
 
     private void getGenres() {
@@ -96,5 +103,29 @@ public class PersonalStatistics extends AppCompatActivity {
             PieEntry newEntry = new PieEntry((float)genre.getValue()/nrOfGenres * 100, genre.getKey());
             pieEntries.add(newEntry);
         }
+    }
+
+    private String getRuntime() {
+
+        this.mydb = new ListDBHelper(this);
+        cursor = mydb.getAllFilms("watched");
+        cursor.moveToFirst();
+        int count = 0;
+
+        while(!cursor.isAfterLast()){
+            count += Integer.parseInt(cursor.getString(cursor.getColumnIndex("movie_runtime")));
+
+            System.out.println("************************************************************************************************");
+
+            cursor.moveToNext();
+        }
+        int hours = count / 60;
+        int minutes = count % 60;
+        String here = "Total watchtime: ";
+        here+=hours;
+        here+=" Hours and ";
+        here+=minutes;
+        here+=" Minutes";
+        return here;
     }
 }

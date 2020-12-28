@@ -31,6 +31,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.view.View.VISIBLE;
+
 public class FavoriteMovies extends AppCompatActivity {
     ListDBHelper mydb;
     TextView title;
@@ -47,13 +49,18 @@ public class FavoriteMovies extends AppCompatActivity {
     String foundActor2 = "";
     String foundPosterUrl = "";
     String foundTitle = "";
-
+    String foundRuntime = "";
+    String foundRated = "";
+    String foundPlot = "";
+    String foundAwards = "";
+    String foundimdbRating = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.show_watched);
         setContentView(R.layout.activity_show_watchlist);
+
         this.lstView = findViewById(R.id.lstView);
         this.mydb = new ListDBHelper(this);
         showFavorites();
@@ -65,6 +72,12 @@ public class FavoriteMovies extends AppCompatActivity {
             if (this.mydb == null)
                 this.mydb = new ListDBHelper(this);
             Cursor c = mydb.getAllFilms("favorites");
+            if (c.getCount() == 0) {
+                ImageView i = findViewById(R.id.showifnotimg);
+                i.setVisibility(VISIBLE);
+                TextView t = findViewById(R.id.showifnottxt);
+                t.setVisibility(VISIBLE);
+            }
             System.out.println("showFavorites()");
             System.out.println(c.getCount());
             CustomCursorAdapterFavorites customCursorAdapter = new CustomCursorAdapterFavorites(this, c);
@@ -146,8 +159,14 @@ public class FavoriteMovies extends AppCompatActivity {
                             foundGenre = result.getString("Genre");
                             foundDirector = result.getString("Director");
                             foundWriter = result.getString("Writer");
-                            String actorsstring = result.getString("Actors");
+                            foundRuntime = result.getString("Runtime");
+                            foundRuntime = foundRuntime.replace(" min", "");
+                            foundRated = result.getString("Rated");
+                            foundPlot = result.getString("Plot");
+                            foundAwards = result.getString("Awards");
+                            foundimdbRating = result.getString("imdbRating");
                             List<String> actorsList = new ArrayList<>();
+                            String actorsstring = result.getString("Actors");
                             int len = actorsstring.split(",").length;
                             if (len == 1) {
                                 foundActor1 = (actorsstring.split(",")[0]);
@@ -159,6 +178,9 @@ public class FavoriteMovies extends AppCompatActivity {
                                 foundActor1 = "";
                                 foundActor2 = "";
                             }
+                            foundActor1 = result.getString("Actors");
+                            foundActor2 = "";
+
 
                             foundPosterUrl = result.getString("Poster");
                         } catch (JSONException e) {
@@ -178,8 +200,8 @@ public class FavoriteMovies extends AppCompatActivity {
     }
 
     public void saveData(View view) {
-        if (mydb.addFilm("watched", this.foundTitle, Integer.parseInt(this.year.getText().toString()), this.genre.getText().toString(), this.foundPosterUrl, this.foundDirector, this.foundWriter, this.foundActor1, this.foundActor2)) {
-            startActivity(new Intent(FavoriteMovies.this, ListManager.class));
+        if (mydb.addFilm("favorites", this.foundTitle, Integer.parseInt(this.year.getText().toString()), this.genre.getText().toString(), this.foundPosterUrl, this.foundDirector, this.foundWriter, this.foundActor1, this.foundActor2, this.foundRuntime, this.foundRated, this.foundPlot, this.foundAwards, this.foundimdbRating)) {
+            startActivity(new Intent(FavoriteMovies.this, FavoriteMovies.class));
             Toast.makeText(getApplicationContext(), "Successfully Added! xD", Toast.LENGTH_SHORT).show();
 
         } else {

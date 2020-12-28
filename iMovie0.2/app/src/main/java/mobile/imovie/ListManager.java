@@ -31,6 +31,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.view.View.VISIBLE;
+
 public class ListManager extends AppCompatActivity {
     ListDBHelper mydb;
     TextView title;
@@ -47,6 +49,11 @@ public class ListManager extends AppCompatActivity {
     String foundActor2 = "";
     String foundPosterUrl = "";
     String foundTitle = "";
+    String foundRuntime = "";
+    String foundRated = "";
+    String foundPlot = "";
+    String foundAwards = "";
+    String foundimdbRating = "";
 
 
     @Override
@@ -65,6 +72,12 @@ public class ListManager extends AppCompatActivity {
             if (this.mydb == null)
                 this.mydb = new ListDBHelper(this);
             Cursor c = mydb.getAllFilms("watched");
+            if (c.getCount() == 0) {
+                ImageView i = findViewById(R.id.showifnotimg);
+                i.setVisibility(VISIBLE);
+                TextView t = findViewById(R.id.showifnottxt);
+                t.setVisibility(VISIBLE);
+            }
             CustomCursorAdapterWatched customCursorAdapter = new CustomCursorAdapterWatched(this, c);
             lstView.setAdapter(customCursorAdapter);
 //            adapter = new SimpleCursorAdapter(this,
@@ -100,8 +113,8 @@ public class ListManager extends AppCompatActivity {
         TextView titleView = titleLayout.findViewById(R.id.firstListElement);
         TextView yearView = parent.findViewById(R.id.secondListElement);
         ListDBHelper listDB = new ListDBHelper(this);
-        DBHelper.Film found = mydb.getFilmByTitleAndYear(titleView.getText().toString(),yearView.getText().toString());
-        listDB.addFilm("favorites", titleView.getText().toString(), Integer.parseInt(yearView.getText().toString()), found.foundGenre,mydb.getFilmPoster(titleView.getText().toString(), yearView.getText().toString()),found.foundDirector,found.foundScreenwriter,found.foundactor1,found.foundactor2);
+        DBHelper.Film found = mydb.getFilmByTitleAndYear(titleView.getText().toString(), yearView.getText().toString());
+        listDB.addFilm("favorites", titleView.getText().toString(), Integer.parseInt(yearView.getText().toString()), found.foundGenre, mydb.getFilmPoster(titleView.getText().toString(), yearView.getText().toString()), found.foundDirector, found.foundScreenwriter, found.foundactor1, found.foundactor2, found.Runtime, found.Rated, found.Plot, found.Awards, found.imdbRating);
         if (mydb.deleteFilm("watched", titleView.getText().toString(), Integer.parseInt(yearView.getText().toString())) > 0) {
             showWatched();
         }
@@ -164,8 +177,14 @@ public class ListManager extends AppCompatActivity {
                             foundGenre = result.getString("Genre");
                             foundDirector = result.getString("Director");
                             foundWriter = result.getString("Writer");
-                            String actorsstring = result.getString("Actors");
+                            foundRuntime = result.getString("Runtime");
+                            foundRuntime = foundRuntime.replace(" min", "");
+                            foundRated = result.getString("Rated");
+                            foundPlot = result.getString("Plot");
+                            foundAwards = result.getString("Awards");
+                            foundimdbRating = result.getString("imdbRating");
                             List<String> actorsList = new ArrayList<>();
+                            String actorsstring = result.getString("Actors");
                             int len = actorsstring.split(",").length;
                             if (len == 1) {
                                 foundActor1 = (actorsstring.split(",")[0]);
@@ -177,6 +196,25 @@ public class ListManager extends AppCompatActivity {
                                 foundActor1 = "";
                                 foundActor2 = "";
                             }
+                            foundActor1 = result.getString("Actors");
+                            foundActor2 = "";
+//                            List<String> actorsList = new ArrayList<>();
+//                            for(String s:actorsstring.split(","))
+//                            {
+//                                System.out.println(s);
+//                            }
+//                            int len = actorsstring.split(",").length;
+//                            if (len == 1) {
+//                                foundActor1 = (actorsstring.split(",")[0]);
+//                                foundActor2 = "";
+//                            } else if (len == 2) {
+//                                foundActor1 = (actorsstring.split(",")[0]);
+//                                foundActor2 = (actorsstring.split(",")[1]);
+//                            } else {
+//                                foundActor1 = "";
+//                                foundActor2 = "";
+//                            }
+
 
                             foundPosterUrl = result.getString("Poster");
                         } catch (JSONException e) {
@@ -196,7 +234,7 @@ public class ListManager extends AppCompatActivity {
     }
 
     public void saveData(View view) {
-        if (mydb.addFilm("watched", this.foundTitle, Integer.parseInt(this.year.getText().toString()), this.genre.getText().toString(), this.foundPosterUrl, this.foundDirector, this.foundWriter, this.foundActor1, this.foundActor2)) {
+        if (mydb.addFilm("watched", this.foundTitle, Integer.parseInt(this.year.getText().toString()), this.genre.getText().toString(), this.foundPosterUrl, this.foundDirector, this.foundWriter, this.foundActor1, this.foundActor2, this.foundRuntime, this.foundRated, this.foundPlot, this.foundAwards, this.foundimdbRating)) {
             startActivity(new Intent(ListManager.this, ListManager.class));
             Toast.makeText(getApplicationContext(), "Successfully Added! xD", Toast.LENGTH_SHORT).show();
 

@@ -28,6 +28,11 @@ public class ListDBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_MOVIE_WRITER = "movie_writer";
     public static final String COLUMN_MOVIE_ACTOR_1 = "movie_actor1";
     public static final String COLUMN_MOVIE_ACTOR_2 = "movie_actor2";
+    public static final String COLUMN_MOVIE_RUNTIME = "movie_runtime";
+    public static final String COLUMN_MOVIE_RATED = "movie_rated";
+    public static final String COLUMN_MOVIE_PLOT = "movie_plot";
+    public static final String COLUMN_MOVIE_AWARDS = "movie_awards";
+    public static final String COLUMN_MOVIE_IMDBRATING = "movie_imdbrating";
 
 
     public ListDBHelper(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
@@ -39,7 +44,7 @@ public class ListDBHelper extends SQLiteOpenHelper {
     }
 
     public ListDBHelper(@Nullable Context context) {
-        super(context, DATABASE_NAME, null, 18);
+        super(context, DATABASE_NAME, null, 26);
         //deleteAllFilms("recommended");
     }
 
@@ -47,7 +52,7 @@ public class ListDBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(
                 "create table movie_lists " +
-                        "(_id integer primary key autoincrement, list_name text,movie_title text, movie_year integer, movie_genre text, movie_director text, movie_writer text, movie_actor1 text, movie_actor2 text,movie_poster text, unique(list_name, movie_title, movie_year))");
+                        "(_id integer primary key autoincrement, list_name text,movie_title text, movie_year integer, movie_genre text, movie_director text, movie_writer text, movie_actor1 text, movie_actor2 text,movie_poster text, movie_runtime text,movie_rated text, movie_plot text, movie_awards text, movie_imdbrating text)");
     }
 
     @Override
@@ -59,23 +64,28 @@ public class ListDBHelper extends SQLiteOpenHelper {
     }
 
 
-    public boolean addFilm(String listName, String filmTitle, Integer releaseYear, String filmGenre, String posterURL, String Director, String Writer, String Actor1, String Actor2) {
-            SQLiteDatabase db = this.getWritableDatabase();
-            ContentValues contantValues = new ContentValues();
-            contantValues.put(COLUMN_LIST_NAME, listName);
-            contantValues.put(COLUMN_MOVIE_TITLE, filmTitle);
-            contantValues.put(COLUMN_MOVIE_YEAR, releaseYear);
-            contantValues.put(COLUMN_MOVIE_POSTER, posterURL);
-            contantValues.put(COLUMN_MOVIE_GENRE_1, filmGenre);
-            contantValues.put(COLUMN_MOVIE_DIRECTOR, Director);
-            contantValues.put(COLUMN_MOVIE_WRITER, Writer);
-            contantValues.put(COLUMN_MOVIE_ACTOR_1, Actor1);
-            contantValues.put(COLUMN_MOVIE_ACTOR_2, Actor2);
+    public boolean addFilm(String listName, String filmTitle, Integer releaseYear, String filmGenre, String posterURL, String Director, String Writer, String Actor1, String Actor2, String Runtime, String Rated, String Plot, String Awards, String imdbRating) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contantValues = new ContentValues();
+        contantValues.put(COLUMN_LIST_NAME, listName);
+        contantValues.put(COLUMN_MOVIE_TITLE, filmTitle);
+        contantValues.put(COLUMN_MOVIE_YEAR, releaseYear);
+        contantValues.put(COLUMN_MOVIE_POSTER, posterURL);
+        contantValues.put(COLUMN_MOVIE_GENRE_1, filmGenre);
+        contantValues.put(COLUMN_MOVIE_DIRECTOR, Director);
+        contantValues.put(COLUMN_MOVIE_WRITER, Writer);
+        contantValues.put(COLUMN_MOVIE_ACTOR_1, Actor1);
+        contantValues.put(COLUMN_MOVIE_ACTOR_2, Actor2);
+        contantValues.put(COLUMN_MOVIE_RUNTIME, Runtime);
+        contantValues.put(COLUMN_MOVIE_RATED, Rated);
+        contantValues.put(COLUMN_MOVIE_PLOT, Plot);
+        contantValues.put(COLUMN_MOVIE_AWARDS, Awards);
+        contantValues.put(COLUMN_MOVIE_IMDBRATING, imdbRating);
         try {
             db.insert(TABLE_NAME, null, contantValues);
             db.close();
             return true;
-        }catch (Exception e){
+        } catch (Exception e) {
             return true;
         }
     }
@@ -107,7 +117,7 @@ public class ListDBHelper extends SQLiteOpenHelper {
 
     public void deleteAllFilms(String listName) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("delete from "+ TABLE_NAME +" where list_name='"+listName+"'");
+        db.execSQL("delete from " + TABLE_NAME + " where list_name='" + listName + "'");
         db.close();
     }
 
@@ -115,7 +125,9 @@ public class ListDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor res = db.rawQuery("Select * from movie_lists where movie_title=? and movie_year=?", new String[]{title, year});
         res.moveToFirst();
-        return new DBHelper.Film(res.getString(res.getColumnIndex("movie_year")), res.getString(res.getColumnIndex("movie_title")), res.getString(res.getColumnIndex("movie_poster")), res.getString(res.getColumnIndex("movie_genre")), res.getString(res.getColumnIndex("movie_director")), res.getString(res.getColumnIndex("movie_writer")), res.getString(res.getColumnIndex("movie_actor1")), res.getString(res.getColumnIndex("movie_actor2")));
+        System.out.println(res.getString(res.getColumnIndex("movie_writer")));
+        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+        return new DBHelper.Film(res.getString(res.getColumnIndex("movie_year")), res.getString(res.getColumnIndex("movie_title")), res.getString(res.getColumnIndex("movie_poster")), res.getString(res.getColumnIndex("movie_genre")), res.getString(res.getColumnIndex("movie_director")), res.getString(res.getColumnIndex("movie_writer")), res.getString(res.getColumnIndex("movie_actor1")), res.getString(res.getColumnIndex("movie_actor2")),res.getString(res.getColumnIndex("movie_runtime")),res.getString(res.getColumnIndex("movie_rated")),res.getString(res.getColumnIndex("movie_plot")),res.getString(res.getColumnIndex("movie_awards")),res.getString(res.getColumnIndex("movie_imdbrating")));
     }
 
     public String getFilmPoster(String title, String year) {
