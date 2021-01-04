@@ -241,7 +241,7 @@ public class RecommendActivity extends AppCompatActivity {
     }
 
     private StringRequest getRecommandations(String title) {
-        final String URL_PREFIX = "http://c1d6e1ef9658.ngrok.io/predict?movie=";
+        final String URL_PREFIX = "http://c3ba91dbf382.ngrok.io/predict?movie=";
 
         String url = URL_PREFIX + title;
 

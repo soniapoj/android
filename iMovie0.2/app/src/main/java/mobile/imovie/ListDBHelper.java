@@ -44,7 +44,7 @@ public class ListDBHelper extends SQLiteOpenHelper {
     }
 
     public ListDBHelper(@Nullable Context context) {
-        super(context, DATABASE_NAME, null, 26);
+        super(context, DATABASE_NAME, null, 28);
         //deleteAllFilms("recommended");
     }
 

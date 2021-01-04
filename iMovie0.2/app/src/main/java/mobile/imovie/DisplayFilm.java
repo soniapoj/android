@@ -106,13 +106,7 @@ public class DisplayFilm extends AppCompatActivity {
         title.addTextChangedListener(new TextWatcher() {
 
             public void afterTextChanged(Editable s) {
-                queue.add(searchNameStringRequest(s.toString()));
-                if (foundYear != "")
-                    year.setText(foundYear);
-                if (foundGenre != "")
-                    genre.setText(foundGenre);
-                if (!foundPosterUrl.equals(""))
-                    Picasso.get().load(foundPosterUrl).into(imgView);
+
             }
 
             public void beforeTextChanged(CharSequence s, int start,
@@ -121,6 +115,15 @@ public class DisplayFilm extends AppCompatActivity {
 
             public void onTextChanged(CharSequence s, int start,
                                       int before, int count) {
+             //   char currentChar = s.charAt(start + before);
+               // String title = String.valueOf(s) + currentChar;
+                queue.add(searchNameStringRequest(s.toString()));
+                if (foundYear != "")
+                    year.setText(foundYear);
+                if (foundGenre != "")
+                    genre.setText(foundGenre);
+                if (!foundPosterUrl.equals(""))
+                    Picasso.get().load(foundPosterUrl).into(imgView);
             }
         });
 

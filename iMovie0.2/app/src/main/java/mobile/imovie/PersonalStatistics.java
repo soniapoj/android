@@ -27,9 +27,11 @@ public class PersonalStatistics extends AppCompatActivity {
     ArrayList pieEntries;
     ArrayList pieEntryLabels;
     ListDBHelper mydb;
+    ListDBHelper mydb1;
     DBHelper wishlistDB;
     HashMap<String, Integer> distinctGenres;
     Cursor cursor;
+    Cursor cursor1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,15 +66,14 @@ public class PersonalStatistics extends AppCompatActivity {
             String text = "Number of movies watched: " + cursor.getCount();
             watched.setText(text);
         }
+        this.mydb1 = new ListDBHelper(this);
         this.wishlistDB = new DBHelper(this);
         cursor = wishlistDB.getAllFilms();
-        if(cursor.getCount() == 0) {
+        cursor1 = mydb1.getAllFilms("watched");
+        if(cursor1.getCount() == 0) {
             setContentView(R.layout.activity_no_movies);
         }
         if(cursor.getCount() > 0){
-
-
-
             String text = "Number of movies on watchlist: " + cursor.getCount();
             wishlist.setText(text);
         }
