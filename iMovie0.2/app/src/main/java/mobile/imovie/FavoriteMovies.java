@@ -106,21 +106,12 @@ public class FavoriteMovies extends AppCompatActivity {
 
     public void addMovie(View v) {
         setContentView(R.layout.activity_display_film);
-        this.title = findViewById(R.id.editTextTitle);
-        this.year = findViewById(R.id.editTextYear);
-        this.genre = findViewById(R.id.editTextGenre);
-        this.imgView = findViewById(R.id.imageView);
         queue = Volley.newRequestQueue(this);
+        this.title = findViewById(R.id.editTextTitle);
         title.addTextChangedListener(new TextWatcher() {
 
             public void afterTextChanged(Editable s) {
                 queue.add(searchNameStringRequest(s.toString()));
-                if (foundYear != "")
-                    year.setText(foundYear);
-                if (foundGenre != "")
-                    genre.setText(foundGenre);
-                if (!foundPosterUrl.equals(""))
-                    Picasso.get().load(foundPosterUrl).into(imgView);
             }
 
             public void beforeTextChanged(CharSequence s, int start,
@@ -183,6 +174,16 @@ public class FavoriteMovies extends AppCompatActivity {
 
 
                             foundPosterUrl = result.getString("Poster");
+                            title = findViewById(R.id.editTextTitle);
+                            year = findViewById(R.id.editTextYear);
+                            genre = findViewById(R.id.editTextGenre);
+                            imgView = findViewById(R.id.imageView);
+                            if (foundYear != "")
+                                year.setText(foundYear);
+                            if (foundGenre != "")
+                                genre.setText(foundGenre);
+                            if (!foundPosterUrl.equals(""))
+                                Picasso.get().load(foundPosterUrl).into(imgView);
                         } catch (JSONException e) {
                             Toast.makeText(FavoriteMovies.this, e.getMessage(), Toast.LENGTH_LONG).show();
                         }
@@ -202,7 +203,8 @@ public class FavoriteMovies extends AppCompatActivity {
     public void saveData(View view) {
         if (mydb.addFilm("favorites", this.foundTitle, Integer.parseInt(this.year.getText().toString()), this.genre.getText().toString(), this.foundPosterUrl, this.foundDirector, this.foundWriter, this.foundActor1, this.foundActor2, this.foundRuntime, this.foundRated, this.foundPlot, this.foundAwards, this.foundimdbRating)) {
             startActivity(new Intent(FavoriteMovies.this, FavoriteMovies.class));
-            Toast.makeText(getApplicationContext(), "Successfully Added! xD", Toast.LENGTH_SHORT).show();
+            if(mydb.addFilm("watched", this.foundTitle, Integer.parseInt(this.year.getText().toString()), this.genre.getText().toString(), this.foundPosterUrl, this.foundDirector, this.foundWriter, this.foundActor1, this.foundActor2, this.foundRuntime, this.foundRated, this.foundPlot, this.foundAwards, this.foundimdbRating)) {}
+                Toast.makeText(getApplicationContext(), "Successfully Added! xD", Toast.LENGTH_SHORT).show();
 
         } else {
             Toast.makeText(getApplicationContext(), "Record not added :( :(", Toast.LENGTH_SHORT).show();

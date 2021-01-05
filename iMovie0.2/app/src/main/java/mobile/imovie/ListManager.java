@@ -101,6 +101,7 @@ public class ListManager extends AppCompatActivity {
         if (mydb.deleteFilm("watched", titleView.getText().toString(), Integer.parseInt(yearView.getText().toString())) > 0) {
             Toast.makeText(getApplicationContext(), "Successfully Deleted! xD", Toast.LENGTH_SHORT).show();
             showWatched();
+            if (mydb.deleteFilm("favorites", titleView.getText().toString(), Integer.parseInt(yearView.getText().toString())) > 0) { }
         } else {
             Toast.makeText(getApplicationContext(), "Record not deleted :( :(", Toast.LENGTH_SHORT).show();
         }
@@ -115,9 +116,9 @@ public class ListManager extends AppCompatActivity {
         ListDBHelper listDB = new ListDBHelper(this);
         DBHelper.Film found = mydb.getFilmByTitleAndYear(titleView.getText().toString(), yearView.getText().toString());
         listDB.addFilm("favorites", titleView.getText().toString(), Integer.parseInt(yearView.getText().toString()), found.foundGenre, mydb.getFilmPoster(titleView.getText().toString(), yearView.getText().toString()), found.foundDirector, found.foundScreenwriter, found.foundactor1, found.foundactor2, found.Runtime, found.Rated, found.Plot, found.Awards, found.imdbRating);
-        if (mydb.deleteFilm("watched", titleView.getText().toString(), Integer.parseInt(yearView.getText().toString())) > 0) {
-            showWatched();
-        }
+//        if (mydb.deleteFilm("watched", titleView.getText().toString(), Integer.parseInt(yearView.getText().toString())) > 0) {
+//            showWatched();
+//        }
         Toast.makeText(getApplicationContext(), "Moved to Favourites!", Toast.LENGTH_SHORT).show();
 
     }
@@ -125,20 +126,11 @@ public class ListManager extends AppCompatActivity {
     public void addMovie(View v) {
         setContentView(R.layout.activity_display_film);
         this.title = findViewById(R.id.editTextTitle);
-        this.year = findViewById(R.id.editTextYear);
-        this.genre = findViewById(R.id.editTextGenre);
-        this.imgView = findViewById(R.id.imageView);
         queue = Volley.newRequestQueue(this);
         title.addTextChangedListener(new TextWatcher() {
 
             public void afterTextChanged(Editable s) {
                 queue.add(searchNameStringRequest(s.toString()));
-                if (foundYear != "")
-                    year.setText(foundYear);
-                if (foundGenre != "")
-                    genre.setText(foundGenre);
-                if (!foundPosterUrl.equals(""))
-                    Picasso.get().load(foundPosterUrl).into(imgView);
             }
 
             public void beforeTextChanged(CharSequence s, int start,
@@ -198,25 +190,17 @@ public class ListManager extends AppCompatActivity {
                             }
                             foundActor1 = result.getString("Actors");
                             foundActor2 = "";
-//                            List<String> actorsList = new ArrayList<>();
-//                            for(String s:actorsstring.split(","))
-//                            {
-//                                System.out.println(s);
-//                            }
-//                            int len = actorsstring.split(",").length;
-//                            if (len == 1) {
-//                                foundActor1 = (actorsstring.split(",")[0]);
-//                                foundActor2 = "";
-//                            } else if (len == 2) {
-//                                foundActor1 = (actorsstring.split(",")[0]);
-//                                foundActor2 = (actorsstring.split(",")[1]);
-//                            } else {
-//                                foundActor1 = "";
-//                                foundActor2 = "";
-//                            }
-
-
                             foundPosterUrl = result.getString("Poster");
+                            title = findViewById(R.id.editTextTitle);
+                            year = findViewById(R.id.editTextYear);
+                            genre = findViewById(R.id.editTextGenre);
+                            imgView = findViewById(R.id.imageView);
+                            if (foundYear != "")
+                                year.setText(foundYear);
+                            if (foundGenre != "")
+                                genre.setText(foundGenre);
+                            if (!foundPosterUrl.equals(""))
+                                Picasso.get().load(foundPosterUrl).into(imgView);
                         } catch (JSONException e) {
                             Toast.makeText(ListManager.this, e.getMessage(), Toast.LENGTH_LONG).show();
                         }

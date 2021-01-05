@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -140,19 +141,17 @@ public class RecommendActivity extends AppCompatActivity {
             c.moveToFirst();
             if (c.getCount() == 0)
                 setContentView(R.layout.activity_no_movies);
-
-                while (!c.isAfterLast()) {
-                    String title = c.getString(c.getColumnIndex("movie_title"));
-                    int year = Integer.parseInt(c.getString(c.getColumnIndex("movie_year")));
-                    if (year <= 2017) {
-                        // Toast.makeText(RecommendActivity.this, "Because you liked: \n" + title, Toast.LENGTH_LONG).show();
-                        queue.add(getRecommandations(title));
-                    }
-                    c.moveToNext();
+            while (!c.isAfterLast()) {
+                String title = c.getString(c.getColumnIndex("movie_title"));
+                int year = Integer.parseInt(c.getString(c.getColumnIndex("movie_year")));
+                if (year <= 2017) {
+                    Toast.makeText(RecommendActivity.this, "Because you liked: \n" + title, Toast.LENGTH_LONG).show();
+                    queue.add(getRecommandations(title));
                 }
-
+                c.moveToNext();
+            }
         } catch (Exception ex) {
-            Toast.makeText(RecommendActivity.this, ex.getMessage(), Toast.LENGTH_LONG).show();
+            //Toast.makeText(RecommendActivity.this, ex.getMessage(), Toast.LENGTH_LONG).show();
         }
         //showRecommended();
     }
@@ -241,7 +240,7 @@ public class RecommendActivity extends AppCompatActivity {
     }
 
     private StringRequest getRecommandations(String title) {
-        final String URL_PREFIX = "http://c3ba91dbf382.ngrok.io/predict?movie=";
+        final String URL_PREFIX = "http://2b35a1df785a.ngrok.io/predict?movie=";
 
         String url = URL_PREFIX + title;
 
@@ -305,6 +304,7 @@ public class RecommendActivity extends AppCompatActivity {
         System.out.println(recommendedList);
         //public boolean addFilm(String listName, String filmTitle, Integer releaseYear, String filmGenre, String posterURL, String Director, String Writer, String Actor1, String Actor2)
         for (DBHelper.Film film : recommendedList) {
+           // Toast.makeText(RecommendActivity.this, film.foundTitle, Toast.LENGTH_LONG).show();
             recommendedDB.addFilm("recommended", film.foundTitle, Integer.parseInt(film.foundYear), film.foundGenre, film.foundPosterUrl, film.foundDirector, film.foundScreenwriter, film.foundactor1, film.foundactor2, film.Runtime, film.Rated, film.Plot, film.Awards, film.imdbRating);
         }
         try {
@@ -319,5 +319,101 @@ public class RecommendActivity extends AppCompatActivity {
         } catch (Exception ex) {
             Toast.makeText(RecommendActivity.this, ex.getMessage(), Toast.LENGTH_LONG).show();
         }
+    }
+
+    public void showDetails(View view) {
+        View parent = (View) view.getParent();
+        View granParent = (View) parent.getParent();
+        View titleLayout = (View) granParent.findViewById(R.id.relativeLayout);
+        TextView titleView = titleLayout.findViewById(R.id.firstListElement);
+        TextView yearView = parent.findViewById(R.id.secondListElement);
+        //System.out.println(titleView);
+        //System.out.println(yearView);
+        // System.out.println(titleView.getText() + "   " + yearView.getText());
+        String Title = titleView.getText().toString();
+        String Year = yearView.getText().toString();
+        DBHelper.Film thisfilm = recommendedDB.getFilmByTitleAndYear(Title, Year);
+        setContentView(R.layout.detailed_film);
+        TextView titletext = findViewById(R.id.titleDetail);
+        titletext.setText(thisfilm.foundTitle);
+        String a = "<b>Title:</b> " + thisfilm.foundTitle;
+        a += "\n";
+        titletext.setText(Html.fromHtml(a));
+        titletext.append("\n");
+        a = "";
+        a = "<b>Year:</b> " + thisfilm.foundYear;
+        TextView yeartext = findViewById(R.id.yearDetail);
+        a += "\n";
+        yeartext.setText(Html.fromHtml(a));
+        yeartext.append("\n");
+        ImageView imgView = findViewById(R.id.PosterDetail);
+        Picasso.get().load(thisfilm.foundPosterUrl).into(imgView);
+        a = "";
+        a = "<b>Genre:</b> " + thisfilm.foundGenre;
+        TextView genretext = findViewById(R.id.genreDetail);
+        genretext.setText(Html.fromHtml(a));
+        genretext.append("\n");
+        a = "";
+        a = "<b>Director:</b> " + thisfilm.foundDirector;
+        TextView directortext = findViewById(R.id.DirectorDetail);
+        directortext.setText(Html.fromHtml(a));
+        directortext.append("\n");
+        //directortext.setText(a);
+        a = "";
+        a = "<b>Screenwriter:</b> " + thisfilm.foundScreenwriter;
+        //TextView screenwritertext = findViewById(R.id.ScreenwriterDetail);
+        /// screenwritertext.setText(a);
+        if (!thisfilm.foundactor1.equals("")) {
+            a = "";
+            a = "<b>Actor:</b> " + thisfilm.foundactor1;
+            if (!thisfilm.foundactor2.equals("")) {
+                a += ", ";
+                a += thisfilm.foundactor2;
+                TextView actor1text = findViewById(R.id.Actor1Detail);
+                actor1text.setText(Html.fromHtml(a));
+                actor1text.append("\n");
+            }
+            TextView actor1text = findViewById(R.id.Actor1Detail);
+            actor1text.setText(Html.fromHtml(a));
+            actor1text.append("\n");
+        } else {
+            TextView actor1text = findViewById(R.id.Actor1Detail);
+            actor1text.setText("");
+        }
+
+
+        a = "";
+        a = "<b>Runtime:</b> " + thisfilm.Runtime;
+        TextView runtimetext = findViewById(R.id.RuntimeDetail);
+        runtimetext.setText(Html.fromHtml(a));
+        runtimetext.append("\n");
+        a = "";
+        a = "<b>Rated:</b> " + thisfilm.Rated;
+        TextView ratedtext = findViewById(R.id.RatedDetail);
+        ratedtext.setText(Html.fromHtml(a));
+        ratedtext.append("\n");
+        a = "";
+        a = "<b>Plot:</b> " + thisfilm.Plot;
+        TextView plottext = findViewById(R.id.PlotDetail);
+        plottext.setText(Html.fromHtml(a));
+        plottext.append("\n");
+        a = "";
+        a = "<b>Awards:</b> " + thisfilm.Awards;
+        TextView awardstext = findViewById(R.id.AwardsDetail);
+        awardstext.setText(Html.fromHtml(a));
+        awardstext.append("\n");
+        a = "";
+        a = "<b>imdbRating:</b> " + thisfilm.imdbRating;
+        a += "/10";
+        TextView imdbtext = findViewById(R.id.imdbRatingDetail);
+        imdbtext.setText(Html.fromHtml(a));
+        imdbtext.append("\n");
+        a = "";
+        a += "         ";
+        TextView emptytext = findViewById(R.id.empty);
+        emptytext.setText(a);
+        emptytext.append("\n");
+
+
     }
 }

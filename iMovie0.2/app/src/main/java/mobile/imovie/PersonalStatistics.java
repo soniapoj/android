@@ -28,10 +28,12 @@ public class PersonalStatistics extends AppCompatActivity {
     ArrayList pieEntryLabels;
     ListDBHelper mydb;
     ListDBHelper mydb1;
+    ListDBHelper favoritesDB;
     DBHelper wishlistDB;
     HashMap<String, Integer> distinctGenres;
     Cursor cursor;
     Cursor cursor1;
+    Cursor cursor2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,20 +64,27 @@ public class PersonalStatistics extends AppCompatActivity {
         TextView watched = findViewById(R.id.watched);
         TextView wishlist = findViewById(R.id.wishlist);
         TextView favorites = findViewById(R.id.favorites);
+        this.mydb1 = new ListDBHelper(this);
+        cursor = mydb1.getAllFilms("watched");
         if(cursor.getCount() > 0) {
             String text = "Number of movies watched: " + cursor.getCount();
             watched.setText(text);
         }
-        this.mydb1 = new ListDBHelper(this);
         this.wishlistDB = new DBHelper(this);
+        this.favoritesDB = new ListDBHelper(this);
         cursor = wishlistDB.getAllFilms();
         cursor1 = mydb1.getAllFilms("watched");
-        if(cursor1.getCount() == 0) {
+        cursor2 = favoritesDB.getAllFilms("favorites");
+        if(cursor1.getCount() == 0 && cursor2.getCount() == 0) {
             setContentView(R.layout.activity_no_movies);
         }
         if(cursor.getCount() > 0){
             String text = "Number of movies on watchlist: " + cursor.getCount();
             wishlist.setText(text);
+        }
+        if(cursor.getCount() > 0){
+            String text = "Number of favourite movies: " + cursor2.getCount();
+            favorites.setText(text);
         }
         watchtime.setText(getRuntime());
     }
@@ -83,6 +92,7 @@ public class PersonalStatistics extends AppCompatActivity {
     private void getGenres() {
         pieEntries = new ArrayList<>();
         this.mydb = new ListDBHelper(this);
+        //this.mydb1 = new ListDBHelper(this);
         distinctGenres = new HashMap<>();
         cursor = mydb.getAllFilms("watched");
         cursor.moveToFirst();
@@ -91,7 +101,19 @@ public class PersonalStatistics extends AppCompatActivity {
         while(!cursor.isAfterLast()){
             currentGenres = cursor.getString(cursor.getColumnIndex("movie_genre"));
             String[] genres = currentGenres.split(", ");
-            System.out.println("************************************************************************************************");
+            for(String currentGenre: genres) {
+                if (distinctGenres.containsKey(currentGenre))
+                    distinctGenres.put(currentGenre, distinctGenres.get(currentGenre) + 1);
+                else
+                    distinctGenres.put(currentGenre, 1);
+            }
+            cursor.moveToNext();
+        }
+        cursor = mydb.getAllFilms("favorites");
+        cursor.moveToFirst();
+        while(!cursor.isAfterLast()){
+            currentGenres = cursor.getString(cursor.getColumnIndex("movie_genre"));
+            String[] genres = currentGenres.split(", ");
             for(String currentGenre: genres) {
                 if (distinctGenres.containsKey(currentGenre))
                     distinctGenres.put(currentGenre, distinctGenres.get(currentGenre) + 1);

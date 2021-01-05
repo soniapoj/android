@@ -47,7 +47,7 @@
                 android:id="@+id/watched"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="No movies watched yet!"
+                android:text="No movies in watch history yet!"
                 android:textAlignment="center"
                 android:textSize="25dp"
                 android:paddingTop="25dp"

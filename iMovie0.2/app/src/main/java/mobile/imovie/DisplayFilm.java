@@ -24,6 +24,8 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.squareup.picasso.Picasso;
@@ -34,6 +36,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static android.view.View.VISIBLE;
 
@@ -50,13 +55,13 @@ public class DisplayFilm extends AppCompatActivity {
     EditText titleEdit;
     EditText yearEdit;
     EditText genreEdit;
-    String foundYear = "";
-    String foundGenre = "";
+    static String foundYear = "";
+    static String foundGenre = "";
     String foundDirector = "";
     String foundWriter = "";
     String foundActor1 = "";
     String foundActor2 = "";
-    String foundPosterUrl = "";
+    static String foundPosterUrl = "";
     String foundTitle = "";
     String foundRuntime = "";
     String foundRated = "";
@@ -64,6 +69,7 @@ public class DisplayFilm extends AppCompatActivity {
     String foundAwards = "";
     String foundimdbRating = "";
     SimpleCursorAdapter adapter;
+    RequestFuture<JSONObject> future = RequestFuture.newFuture();
 
 
     @Override
@@ -98,15 +104,11 @@ public class DisplayFilm extends AppCompatActivity {
 
     public void addMovie(View v) {
         setContentView(R.layout.activity_display_film);
-        this.title = findViewById(R.id.editTextTitle);
-        this.year = findViewById(R.id.editTextYear);
-        this.genre = findViewById(R.id.editTextGenre);
-        this.imgView = findViewById(R.id.imageView);
         queue = Volley.newRequestQueue(this);
+        this.title = findViewById(R.id.editTextTitle);
         title.addTextChangedListener(new TextWatcher() {
 
             public void afterTextChanged(Editable s) {
-
             }
 
             public void beforeTextChanged(CharSequence s, int start,
@@ -115,15 +117,7 @@ public class DisplayFilm extends AppCompatActivity {
 
             public void onTextChanged(CharSequence s, int start,
                                       int before, int count) {
-             //   char currentChar = s.charAt(start + before);
-               // String title = String.valueOf(s) + currentChar;
                 queue.add(searchNameStringRequest(s.toString()));
-                if (foundYear != "")
-                    year.setText(foundYear);
-                if (foundGenre != "")
-                    genre.setText(foundGenre);
-                if (!foundPosterUrl.equals(""))
-                    Picasso.get().load(foundPosterUrl).into(imgView);
             }
         });
 
@@ -178,8 +172,18 @@ public class DisplayFilm extends AppCompatActivity {
 
 
                             foundPosterUrl = result.getString("Poster");
+                            title = findViewById(R.id.editTextTitle);
+                            year = findViewById(R.id.editTextYear);
+                            genre = findViewById(R.id.editTextGenre);
+                            imgView = findViewById(R.id.imageView);
+                            if (foundYear != "")
+                                year.setText(foundYear);
+                            if (foundGenre != "")
+                                genre.setText(foundGenre);
+                            if (!foundPosterUrl.equals(""))
+                                Picasso.get().load(foundPosterUrl).into(imgView);
                         } catch (JSONException e) {
-                            Toast.makeText(DisplayFilm.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                           // Toast.makeText(DisplayFilm.this, e.getMessage(), Toast.LENGTH_LONG).show();
                         }
                     } // public void onResponse(String response)
                 }, // Response.Listener<String>()
