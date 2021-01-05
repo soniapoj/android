@@ -59,7 +59,7 @@ public class ListManager extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.show_watched);
+
         setContentView(R.layout.activity_show_watchlist);
         this.lstView = findViewById(R.id.lstView);
         this.mydb = new ListDBHelper(this);
@@ -80,9 +80,6 @@ public class ListManager extends AppCompatActivity {
             }
             CustomCursorAdapterWatched customCursorAdapter = new CustomCursorAdapterWatched(this, c);
             lstView.setAdapter(customCursorAdapter);
-//            adapter = new SimpleCursorAdapter(this,
-//                    R.layout.watched_list_template, c, title, id, 0);
-//            lstView.setAdapter(adapter);
 
         } catch (Exception ex) {
             Toast.makeText(ListManager.this, ex.getMessage(), Toast.LENGTH_LONG).show();
@@ -99,7 +96,7 @@ public class ListManager extends AppCompatActivity {
         System.out.println(yearView);
         System.out.println(titleView.getText() + "   " + yearView.getText());
         if (mydb.deleteFilm("watched", titleView.getText().toString(), Integer.parseInt(yearView.getText().toString())) > 0) {
-            Toast.makeText(getApplicationContext(), "Successfully Deleted! xD", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Successfully Deleted!", Toast.LENGTH_SHORT).show();
             showWatched();
             if (mydb.deleteFilm("favorites", titleView.getText().toString(), Integer.parseInt(yearView.getText().toString())) > 0) { }
         } else {
@@ -116,9 +113,6 @@ public class ListManager extends AppCompatActivity {
         ListDBHelper listDB = new ListDBHelper(this);
         DBHelper.Film found = mydb.getFilmByTitleAndYear(titleView.getText().toString(), yearView.getText().toString());
         listDB.addFilm("favorites", titleView.getText().toString(), Integer.parseInt(yearView.getText().toString()), found.foundGenre, mydb.getFilmPoster(titleView.getText().toString(), yearView.getText().toString()), found.foundDirector, found.foundScreenwriter, found.foundactor1, found.foundactor2, found.Runtime, found.Rated, found.Plot, found.Awards, found.imdbRating);
-//        if (mydb.deleteFilm("watched", titleView.getText().toString(), Integer.parseInt(yearView.getText().toString())) > 0) {
-//            showWatched();
-//        }
         Toast.makeText(getApplicationContext(), "Moved to Favourites!", Toast.LENGTH_SHORT).show();
 
     }
@@ -159,8 +153,7 @@ public class ListManager extends AppCompatActivity {
                     @SuppressLint("ShowToast")
                     @Override
                     public void onResponse(String response) {
-                        // try/catch block for returned JSON data
-                        // see API's documentation for returned format
+
                         try {
                             JSONObject result;
                             result = new JSONObject(response);
@@ -207,12 +200,10 @@ public class ListManager extends AppCompatActivity {
                     } // public void onResponse(String response)
                 }, // Response.Listener<String>()
                 new Response.ErrorListener() {
-                    // 4th param - method onErrorResponse lays the code procedure of error return
-                    // ERROR
+
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // display a simple message on the screen
-                        //Toast.makeText(AddFoodItems.this, "Food source is not responding (USDA API)", Toast.LENGTH_LONG).show();
+
                     }
                 });
     }

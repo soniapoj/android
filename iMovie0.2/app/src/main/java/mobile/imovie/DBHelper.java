@@ -134,44 +134,10 @@ public class DBHelper extends SQLiteOpenHelper {
         return true;
     }
 
-//    public boolean addFilm(String filmTitle, Integer releaseYear, String genre1, String genre2, String genre3, String director, String writer, String actor1, String actor2) {
-//        /*,*/
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        ContentValues contantValues = new ContentValues();
-//        contantValues.put(COLUMN_TITLE, filmTitle);
-//        contantValues.put(COLUMN_RELEASE_YEAR, releaseYear);
-//        contantValues.put(COLUMN_GENRE_1, genre1);
-//        contantValues.put(COLUMN_GENRE_2, genre2);
-//        contantValues.put(COLUMN_GENRE_3, genre3);
-//        contantValues.put(COLUMN_DIRECTOR, director);
-//        contantValues.put(COLUMN_WRITER, writer);
-//        contantValues.put(COLUMN_ACTOR_1, actor1);
-//        contantValues.put(COLUMN_ACTOR_2, actor2);
-//        db.insert(TABLE_NAME, null, contantValues);
-//        db.close();
-//        return true;
-//    }
-
-//    public boolean updateFilm(Integer filmId, String filmTitle, Integer releaseYear, String genre1, String director, String writer, String actor1, String actor2) {
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        ContentValues contantValues = new ContentValues();
-//        contantValues.put(COLUMN_TITLE, filmTitle);
-//        contantValues.put(COLUMN_RELEASE_YEAR, releaseYear);
-//        contantValues.put(COLUMN_GENRE_1, genre1);
-//        //contantValues.put(COLUMN_GENRE_2, genre2);
-//        //contantValues.put(COLUMN_GENRE_3, genre3);
-//        contantValues.put(COLUMN_DIRECTOR, director);
-//        contantValues.put(COLUMN_WRITER, writer);
-//        contantValues.put(COLUMN_ACTOR_1, actor1);
-//        contantValues.put(COLUMN_ACTOR_2, actor2);
-//        db.update(TABLE_NAME, contantValues, "_id = ?", new String[]{Integer.toString(filmId)});
-//        db.close();
-//        return true;
-//    }
 
     public Integer deleteFilm(String title, int year) {
         SQLiteDatabase db = this.getWritableDatabase();
-        //String whereClause = "title=" + title + " and year=?";
+
         return db.delete("watchlist", "title=? and year=?", new String[]{title, Integer.toString(year)});
     }
 

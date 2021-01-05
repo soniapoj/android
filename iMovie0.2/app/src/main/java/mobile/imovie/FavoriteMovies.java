@@ -58,7 +58,7 @@ public class FavoriteMovies extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.show_watched);
+
         setContentView(R.layout.activity_show_watchlist);
 
         this.lstView = findViewById(R.id.lstView);
@@ -190,12 +190,10 @@ public class FavoriteMovies extends AppCompatActivity {
                     } // public void onResponse(String response)
                 }, // Response.Listener<String>()
                 new Response.ErrorListener() {
-                    // 4th param - method onErrorResponse lays the code procedure of error return
-                    // ERROR
+
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // display a simple message on the screen
-                        //Toast.makeText(AddFoodItems.this, "Food source is not responding (USDA API)", Toast.LENGTH_LONG).show();
+
                     }
                 });
     }
@@ -204,7 +202,7 @@ public class FavoriteMovies extends AppCompatActivity {
         if (mydb.addFilm("favorites", this.foundTitle, Integer.parseInt(this.year.getText().toString()), this.genre.getText().toString(), this.foundPosterUrl, this.foundDirector, this.foundWriter, this.foundActor1, this.foundActor2, this.foundRuntime, this.foundRated, this.foundPlot, this.foundAwards, this.foundimdbRating)) {
             startActivity(new Intent(FavoriteMovies.this, FavoriteMovies.class));
             if(mydb.addFilm("watched", this.foundTitle, Integer.parseInt(this.year.getText().toString()), this.genre.getText().toString(), this.foundPosterUrl, this.foundDirector, this.foundWriter, this.foundActor1, this.foundActor2, this.foundRuntime, this.foundRated, this.foundPlot, this.foundAwards, this.foundimdbRating)) {}
-                Toast.makeText(getApplicationContext(), "Successfully Added! xD", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Successfully Added!", Toast.LENGTH_SHORT).show();
 
         } else {
             Toast.makeText(getApplicationContext(), "Record not added :( :(", Toast.LENGTH_SHORT).show();

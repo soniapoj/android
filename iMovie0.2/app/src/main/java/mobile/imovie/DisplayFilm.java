@@ -98,7 +98,7 @@ public class DisplayFilm extends AppCompatActivity {
             lstView.setAdapter(customCursorAdapter);
 
         } catch (Exception ex) {
-            Toast.makeText(DisplayFilm.this, ex.getMessage(), Toast.LENGTH_LONG).show();
+
         }
     }
 
@@ -138,8 +138,6 @@ public class DisplayFilm extends AppCompatActivity {
                     @SuppressLint("ShowToast")
                     @Override
                     public void onResponse(String response) {
-                        // try/catch block for returned JSON data
-                        // see API's documentation for returned format
                         try {
                             JSONObject result;
                             result = new JSONObject(response);
@@ -183,17 +181,15 @@ public class DisplayFilm extends AppCompatActivity {
                             if (!foundPosterUrl.equals(""))
                                 Picasso.get().load(foundPosterUrl).into(imgView);
                         } catch (JSONException e) {
-                           // Toast.makeText(DisplayFilm.this, e.getMessage(), Toast.LENGTH_LONG).show();
+
                         }
                     } // public void onResponse(String response)
                 }, // Response.Listener<String>()
                 new Response.ErrorListener() {
-                    // 4th param - method onErrorResponse lays the code procedure of error return
-                    // ERROR
+
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // display a simple message on the screen
-                        //Toast.makeText(AddFoodItems.this, "Food source is not responding (USDA API)", Toast.LENGTH_LONG).show();
+
                     }
                 });
     }
@@ -201,7 +197,7 @@ public class DisplayFilm extends AppCompatActivity {
     public void saveData(View view) {
         if (mydb.addFilm(this.foundTitle, Integer.parseInt(this.year.getText().toString()), this.genre.getText().toString(), this.foundPosterUrl, this.foundDirector, this.foundWriter, this.foundActor1, this.foundActor2, this.foundRuntime, this.foundRated, this.foundPlot, this.foundAwards, this.foundimdbRating)) {
             startActivity(new Intent(DisplayFilm.this, DisplayFilm.class));
-            Toast.makeText(getApplicationContext(), "Successfully Added! xD", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Successfully Added!", Toast.LENGTH_SHORT).show();
 
         } else {
             Toast.makeText(getApplicationContext(), "Record not added :( :(", Toast.LENGTH_SHORT).show();
@@ -219,7 +215,7 @@ public class DisplayFilm extends AppCompatActivity {
         System.out.println(yearView);
         System.out.println(titleView.getText() + "   " + yearView.getText());
         if (mydb.deleteFilm(titleView.getText().toString(), Integer.parseInt(yearView.getText().toString())) > 0) {
-            Toast.makeText(getApplicationContext(), "Successfully Deleted! xD", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Successfully Deleted!", Toast.LENGTH_SHORT).show();
             showWatchlist();
         } else {
             Toast.makeText(getApplicationContext(), "Record not deleted :( :(", Toast.LENGTH_SHORT).show();
@@ -250,9 +246,7 @@ public class DisplayFilm extends AppCompatActivity {
         View titleLayout = (View) granParent.findViewById(R.id.relativeLayout);
         TextView titleView = titleLayout.findViewById(R.id.firstListElement);
         TextView yearView = parent.findViewById(R.id.secondListElement);
-        //System.out.println(titleView);
-        //System.out.println(yearView);
-        // System.out.println(titleView.getText() + "   " + yearView.getText());
+
         String Title = titleView.getText().toString();
         String Year = yearView.getText().toString();
         DBHelper.Film thisfilm = mydb.getFilmByTitleAndYear(Title, Year);
@@ -281,11 +275,10 @@ public class DisplayFilm extends AppCompatActivity {
         TextView directortext = findViewById(R.id.DirectorDetail);
         directortext.setText(Html.fromHtml(a));
         directortext.append("\n");
-        //directortext.setText(a);
+
         a = "";
         a = "<b>Screenwriter:</b> " + thisfilm.foundScreenwriter;
-        //TextView screenwritertext = findViewById(R.id.ScreenwriterDetail);
-        /// screenwritertext.setText(a);
+
         if (!thisfilm.foundactor1.equals("")) {
             a = "";
             a = "<b>Actor:</b> " + thisfilm.foundactor1;

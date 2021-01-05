@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void showWatchlist(View v){
         startActivity(new Intent(MainActivity.this, DisplayFilm.class));
-        //setContentView(R.layout.no_info);
+
     }
 
     public void showWatched(View v){
